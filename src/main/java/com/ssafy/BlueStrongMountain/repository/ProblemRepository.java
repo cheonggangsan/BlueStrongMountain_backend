@@ -9,7 +9,4 @@ public interface ProblemRepository {
 
     List<ProblemDto> findByIdList(List<Long> ids);
 
-    Set<Long> findSolvedProblemsByGroupUsers(Long groupId);
-
-    List<Long> findReviewProblemIdsByGroup(Long groupId);
 }

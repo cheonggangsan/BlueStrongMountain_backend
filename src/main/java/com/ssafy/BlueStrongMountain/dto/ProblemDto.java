@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class ProblemDto {
-    private Integer id;
+    private Long id;
     private String title;
     private Integer difficulty;
     private List<String> tags;
