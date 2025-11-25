@@ -34,7 +34,7 @@ public class ProblemFetchServiceImpl implements ProblemFetchService{
             System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             System.out.println("test unsolved problems");
             for(Long ele : solvedProblemIds){
-                System.out.println(ele);
+                System.out.println(ele); //test
             }
 
             List<ProblemDto> testDto =  allProblems.stream()
@@ -44,6 +44,7 @@ public class ProblemFetchServiceImpl implements ProblemFetchService{
             for(ProblemDto ele : testDto){
                 System.out.println(ele.toString());
             }
+            //test
             return testDto;
         }
         return problemRepository.findAll();

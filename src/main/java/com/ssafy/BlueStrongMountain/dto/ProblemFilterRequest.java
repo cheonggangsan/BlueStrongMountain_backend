@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class ProblemFilterRequest {
     private String mode; // "normal" or "review"
-    private List<Integer> problemIds;
+    private List<Long> problemIds;
     private Integer difficultyFrom;
     private Integer difficultyTo;
     private List<String> tags;

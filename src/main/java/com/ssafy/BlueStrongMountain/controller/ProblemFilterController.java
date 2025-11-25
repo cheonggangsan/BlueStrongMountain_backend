@@ -33,11 +33,16 @@ public class ProblemFilterController {
             @RequestBody ProblemFilterRequest request
     ) {
 
-        String mode = request.getMode();
+        String mode;
+        if(request.getMode() == null){
+            mode = "normal";
+        }else{
+            mode = request.getMode();
+        }
+
         List<ProblemDto> base;
         if(mode.equals("review")){
             base = fetchService.fetchReviewProblems(groupId);
-            System.out.println("this is review ?????????????????????????????????");
 
         }else{
             base = fetchService.fetchBaseProblems(groupId, request.getUnsolved());
@@ -52,12 +57,14 @@ public class ProblemFilterController {
         List<ProblemDto> filtered = filterService.applyFilters(base, request);
 
 //
-//        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//        System.out.println(request.toString());
-//
-//        for(ProblemDto pd : filtered){
-//            System.out.println(pd.toString());
-//        }
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");//test
+        System.out.println(request.toString());
+        System.out.println("filtering problems start!");
+
+        for(ProblemDto pd : filtered){
+            System.out.println(pd.toString());
+        }
+        System.out.println("filtering problems end!");//test
 
 
         return ResponseEntity.ok(new FilteredProblemsResponse(true, filtered));
