@@ -19,8 +19,9 @@ public class ProblemFilterServiceImpl implements ProblemFilterService{
                 .toList();
     }
     private boolean filterByIds(ProblemFilterRequest req, ProblemDto p) {
+       // System.out.println("filter problem ID here?!!?!??!?!!?!!!!!!!!!!!???????????????????????????????????");//test
         if (req.getProblemIds() == null || req.getProblemIds().isEmpty()) return true;
-       // System.out.println("filter problem ID here!!!!");//test
+        //System.out.println(req.getProblemIds().contains(p.getId()));
 
         return req.getProblemIds().contains(p.getId());
     }

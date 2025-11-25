@@ -5,12 +5,13 @@ import com.ssafy.BlueStrongMountain.dto.FilteredProblemsResponse;
 import com.ssafy.BlueStrongMountain.dto.ProblemFilterRequest;
 import com.ssafy.BlueStrongMountain.service.ProblemFetchService;
 import com.ssafy.BlueStrongMountain.service.ProblemFilterService;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,21 +28,34 @@ public class ProblemFilterController {
         this.filterService = filterService;
     }
 
-    @PostMapping("/filter")
+    @GetMapping("/filter")
     public ResponseEntity<FilteredProblemsResponse> filter(
             @PathVariable Long groupId,
-            @RequestBody ProblemFilterRequest request
+            @RequestParam(required = false) String mode,
+            @RequestParam(required = false) List<Long> problemIds,
+            @RequestParam(required = false) Integer difficultyFrom,
+            @RequestParam(required = false) Integer difficultyTo,
+            @RequestParam(required = false) List<String> tags,
+            @RequestParam(required = false) Integer minSolvers,
+            @RequestParam(required = false) Boolean unsolved
     ) {
 
-        String mode;
-        if(request.getMode() == null){
-            mode = "normal";
-        }else{
-            mode = request.getMode();
-        }
+        ProblemFilterRequest request = new ProblemFilterRequest(
+                mode,
+                problemIds,
+                difficultyFrom,
+                difficultyTo,
+                tags,
+                minSolvers,
+                unsolved
+        );
+        System.out.println("test request DTO");
+        System.out.println(request.toString());
+
+
 
         List<ProblemDto> base;
-        if(mode.equals("review")){
+        if(request.getMode().equals("review")){
             base = fetchService.fetchReviewProblems(groupId);
 
         }else{
