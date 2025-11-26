@@ -12,13 +12,13 @@ public class ProblemFilterServiceImpl implements ProblemFilterService{
     @Override
     public List<ProblemDto> applyFilters(List<ProblemDto> base, ProblemFilterRequest req) {
         return base.stream()
-                .filter(p -> filterByIds(req, p))
+                .filter(p -> filterByProblemIds(req, p))
                 .filter(p -> filterByDifficulty(req, p))
                 .filter(p -> filterByTags(req, p))
-                .filter(p -> filterBySolvers(req, p))
+                .filter(p -> filterByMinSolvers(req, p))
                 .toList();
     }
-    private boolean filterByIds(ProblemFilterRequest req, ProblemDto p) {
+    private boolean filterByProblemIds(ProblemFilterRequest req, ProblemDto p) {
        // System.out.println("filter problem ID here?!!?!??!?!!?!!!!!!!!!!!???????????????????????????????????");//test
         if (req.getProblemIds() == null || req.getProblemIds().isEmpty()) return true;
         //System.out.println(req.getProblemIds().contains(p.getId()));
@@ -39,7 +39,7 @@ public class ProblemFilterServiceImpl implements ProblemFilterService{
         );
     }
 
-    private boolean filterBySolvers(ProblemFilterRequest req, ProblemDto p) {
+    private boolean filterByMinSolvers(ProblemFilterRequest req, ProblemDto p) {
         if (req.getMinSolvers() == null) return true;
         return p.getAcceptedUserCount() >= req.getMinSolvers();
     }
