@@ -37,6 +37,7 @@ public class MockGroupRepository implements GroupRepository{
     public List<Long> findUsersSolvedProblems(Long groupId) {
         return MOCK_EACH_USERS_SOLVED_PROBLEMS.stream()
                 .map(UserSolvedDto::getProblemId)
+                .distinct()
                 .collect(Collectors.toList());
     }
 }

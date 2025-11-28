@@ -27,9 +27,11 @@ public class ProblemFetchServiceImpl implements ProblemFetchService{
     public List<ProblemDto> fetchBaseProblems(Long groupId, Boolean unsolved) {
         if (Boolean.TRUE.equals(unsolved)) {
             // 그룹에서 해결된 문제 ID 가져오기
-            List<Long> solvedProblemIds = groupRepository.findGroupSolvedProblems(groupId);
+            //List<Long> solvedProblemIds = groupRepository.findGroupSolvedProblems(groupId);
             // 모든 문제를 가져옴
             List<ProblemDto> allProblems = problemRepository.findAll();
+
+            List<Long> solvedProblemIds = groupRepository.findUsersSolvedProblems(groupId);
 
             System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             System.out.println("test unsolved problems");
