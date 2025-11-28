@@ -65,4 +65,7 @@ public class Group {
         this.ownerId = newOwnerId;
         this.updatedAt = now;
     }
+    private void setId(Long id){
+        this.id = id;
+    }
 }
