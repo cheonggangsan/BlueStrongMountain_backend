@@ -25,26 +25,28 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     }
 
     @Override
-    public void addManager(
+    public void addManagers(
             final Long requesterId,
             final Long groupId,
-            final Long userId
+            final List<Long> managerIds
     ) {
         groupAuthorityService.validateOwner(requesterId, groupId);
 
-        final UserGroup target = userGroupRepository.findByUserIdAndGroupId(userId, groupId)
-                .orElseThrow(() -> new UserNotInGroupException(userId, groupId));
+        for(Long managerId : managerIds){
+            final UserGroup target = userGroupRepository.findByUserIdAndGroupId(managerId, groupId)
+                    .orElseThrow(() -> new UserNotInGroupException(managerId, groupId));
 
-        if (target.getRole() == GroupRole.MANAGER) {
-            //throw new AlreadyManagerException(userId, groupId);
+            if (target.getRole() == GroupRole.MANAGER) {
+                //throw new AlreadyManagerException(userId, groupId);
+            }
+
+            if (target.getRole() == GroupRole.OWNER) {
+                throw new CannotRemoveOwnerException(managerId, groupId);
+            }
+
+            target.changeRole(GroupRole.MANAGER);
+            userGroupRepository.save(target);
         }
-
-        if (target.getRole() == GroupRole.OWNER) {
-            throw new CannotRemoveOwnerException(userId, groupId);
-        }
-
-        target.changeRole(GroupRole.MANAGER);
-        userGroupRepository.save(target);
     }
 
     @Override
@@ -73,43 +75,48 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     }
 
     @Override
-    public void addMember(
+    public void addMembers(
             final Long requesterId,
             final Long groupId,
-            final Long userId
+            final List<Long> userIds
     ) {
         groupAuthorityService.validateManager(requesterId, groupId);
 
-        final boolean exists = userGroupRepository.findByUserIdAndGroupId(userId, groupId).isPresent();
-        if (exists) {
-            //중복 사용자 발생 예외 추가
-        }
+        for(Long userId : userIds){
+            final boolean exists = userGroupRepository.findByUserIdAndGroupId(userId, groupId).isPresent();
+            if (exists) {
+                //중복 사용자 발생 예외 추가
+                continue;
+            }
 
-        final LocalDateTime now = LocalDateTime.now();
-        final UserGroup userGroup = UserGroup.create(userId, groupId, GroupRole.MEMBER, now);
-        userGroupRepository.save(userGroup);
+            final LocalDateTime now = LocalDateTime.now();
+            final UserGroup userGroup = UserGroup.create(userId, groupId, GroupRole.MEMBER, now);
+            userGroupRepository.save(userGroup);
+        }
     }
 
     @Override
-    public void removeMember(
+    public void removeMembers(
             final Long requesterId,
             final Long groupId,
-            final Long memberId
+            final List<Long> userIds
     ) {
         groupAuthorityService.validateOwner(requesterId, groupId);
 
-        if (memberId.equals(requesterId)) {
-            throw new CannotRemoveOwnerException(memberId, groupId);
+        for(Long userId : userIds){
+            if (userId.equals(requesterId)) {
+                throw new CannotRemoveOwnerException(userId, groupId);
+            }
+
+            final UserGroup userGroup = userGroupRepository.findByUserIdAndGroupId(userId, groupId)
+                    .orElseThrow(() -> new UserNotInGroupException(userId, groupId));
+
+            if (userGroup.getRole() == GroupRole.OWNER) {
+                throw new CannotRemoveOwnerException(userId, groupId);
+            }
+
+            userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
         }
-
-        final UserGroup userGroup = userGroupRepository.findByUserIdAndGroupId(memberId, groupId)
-                .orElseThrow(() -> new UserNotInGroupException(memberId, groupId));
-
-        if (userGroup.getRole() == GroupRole.OWNER) {
-            throw new CannotRemoveOwnerException(memberId, groupId);
-        }
-
-        userGroupRepository.deleteByUserIdAndGroupId(memberId, groupId);
     }
 
     @Override

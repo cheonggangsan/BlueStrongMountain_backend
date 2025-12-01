@@ -90,9 +90,9 @@ public class GroupController {
     public ResponseEntity<?> addManager(
             @RequestParam Long requesterId,
             @PathVariable Long groupId,
-            @RequestBody UserIdRequest request
+            @RequestBody UserIdsRequest request
     ) {
-        groupMemberService.addManager(requesterId, groupId, request.getUserId());
+        groupMemberService.addManagers(requesterId, groupId, request.getUserIds());
         return ResponseEntity.ok(success());
     }
 
@@ -116,22 +116,22 @@ public class GroupController {
     public ResponseEntity<?> addMember(
             @RequestParam Long requesterId,
             @PathVariable Long groupId,
-            @RequestBody UserIdRequest request
+            @RequestBody UserIdsRequest request
     ) {
-        groupMemberService.addMember(requesterId, groupId, request.getUserId());
+        groupMemberService.addMembers(requesterId, groupId, request.getUserIds());
         return ResponseEntity.ok(success());
     }
 
     /**
      * Member 강제 삭제
      */
-    @DeleteMapping("/{groupId}/members/{memberId}")
+    @DeleteMapping("/{groupId}/members")
     public ResponseEntity<?> removeMember(
             @RequestParam Long requesterId,
             @PathVariable Long groupId,
-            @PathVariable Long memberId
+            @RequestBody UserIdsRequest request
     ) {
-        groupMemberService.removeMember(requesterId, groupId, memberId);
+        groupMemberService.removeMembers(requesterId, groupId, request.getUserIds());
         return ResponseEntity.ok(success());
     }
 
@@ -166,11 +166,11 @@ public class GroupController {
         }
     }
 
-    public static class UserIdRequest {
-        private Long userId;
+    public static class UserIdsRequest {
+        private List<Long> userIds;
 
-        public Long getUserId() {
-            return userId;
+        public List<Long> getUserIds() {
+            return userIds;
         }
     }
 

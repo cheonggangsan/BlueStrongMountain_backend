@@ -1,9 +1,11 @@
 package com.ssafy.BlueStrongMountain.service;
 
+import java.util.List;
+
 public interface GroupMemberService {
-    void addManager(Long requesterId, Long groupId, Long userId);
-    void removeManagers(Long requesterId, Long groupId, java.util.List<Long> managerIds);
-    void addMember(Long requesterId, Long groupId, Long userId);
-    void removeMember(Long requesterId, Long groupId, Long memberId);
+    void addManagers(Long requesterId, Long groupId, List<Long> userIds);
+    void removeManagers(Long requesterId, Long groupId, List<Long> managerIds);
+    void addMembers(Long requesterId, Long groupId, List<Long> userIds);
+    void removeMembers(Long requesterId, Long groupId, List<Long> userIds);
     void leaveGroup(Long requesterId, Long groupId);
 }
