@@ -1,11 +1,13 @@
 package com.ssafy.BlueStrongMountain.controller;
 
+import com.ssafy.BlueStrongMountain.dto.BaseResponse;
 import com.ssafy.BlueStrongMountain.dto.GroupCreateRequest;
 import com.ssafy.BlueStrongMountain.dto.GroupSummaryDto;
 import com.ssafy.BlueStrongMountain.dto.GroupUpdateRequest;
 import com.ssafy.BlueStrongMountain.service.GroupMemberService;
 import com.ssafy.BlueStrongMountain.service.GroupService;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,24 +15,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/groups")
+@RequiredArgsConstructor
 public class GroupController {
 
     private final GroupService groupService;
     private final GroupMemberService groupMemberService;
 
-    public GroupController(
-            final GroupService groupService,
-            final GroupMemberService groupMemberService
-    ) {
-        this.groupService = groupService;
-        this.groupMemberService = groupMemberService;
-    }
 
     /**
      * 그룹 생성
      */
     @PostMapping
-    public ResponseEntity<?> createGroup(
+    public ResponseEntity<BaseResponse> createGroup(
             @RequestParam Long requesterId,
             @RequestBody GroupCreateRequest request
     ) {
@@ -38,7 +34,7 @@ public class GroupController {
         System.out.println("!!!!created group id!!!!");
         System.out.println(createdGroupId);
 
-        return ResponseEntity.ok().body(success());
+        return ResponseEntity.ok(BaseResponse.ok());
     }
 
     /**
@@ -73,133 +69,90 @@ public class GroupController {
      * 그룹 수정 (OWNER)
      */
     @PatchMapping("/{groupId}")
-    public ResponseEntity<?> updateGroup(
+    public ResponseEntity<BaseResponse> updateGroup(
             @RequestParam Long requesterId,
             @PathVariable Long groupId,
             @RequestBody GroupUpdateRequest request
     ) {
         groupService.updateGroup(requesterId, groupId, request);
-        return ResponseEntity.ok(success());
+        return ResponseEntity.ok(BaseResponse.ok());
     }
 
     /**
      * 그룹 소유권 이전
      */
     @PatchMapping("/{groupId}/owner")
-    public ResponseEntity<?> changeOwner(
+    public ResponseEntity<BaseResponse> changeOwner(
             @RequestParam Long requesterId,
             @PathVariable Long groupId,
-            @RequestBody(required = true) OwnerChangeRequest req
+            @RequestBody(required = true) Long newOwnerId
     ) {
-        groupService.changeOwner(requesterId, groupId, req.getNewOwnerId());
-        return ResponseEntity.ok(success());
+        groupService.changeOwner(requesterId, groupId, newOwnerId);
+        return ResponseEntity.ok(BaseResponse.ok());
     }
 
     /**
      * Manager 추가
      */
     @PostMapping("/{groupId}/managers")
-    public ResponseEntity<?> addManager(
+    public ResponseEntity<BaseResponse> addManager(
             @RequestParam Long requesterId,
             @PathVariable Long groupId,
-            @RequestBody UserIdsRequest request
+            @RequestBody List<Long> newManagerIds
     ) {
-        groupMemberService.addManagers(requesterId, groupId, request.getUserIds());
-        return ResponseEntity.ok(success());
+        groupMemberService.addManagers(requesterId, groupId, newManagerIds);
+        return ResponseEntity.ok(BaseResponse.ok());
     }
 
     /**
      * Manager 삭제 (bulk)
      */
     @DeleteMapping("/{groupId}/managers")
-    public ResponseEntity<?> removeManagers(
+    public ResponseEntity<BaseResponse> removeManagers(
             @RequestParam Long requesterId,
             @PathVariable Long groupId,
-            @RequestBody ManagerIdsRequest request
+            @RequestBody List<Long> delManagerIds
     ) {
-        groupMemberService.removeManagers(requesterId, groupId, request.getManagerIds());
-        return ResponseEntity.ok(success());
+        groupMemberService.removeManagers(requesterId, groupId, delManagerIds);
+        return ResponseEntity.ok(BaseResponse.ok());
     }
 
     /**
      * Member 추가
      */
     @PostMapping("/{groupId}/members")
-    public ResponseEntity<?> addMember(
+    public ResponseEntity<BaseResponse> addMember(
             @RequestParam Long requesterId,
             @PathVariable Long groupId,
-            @RequestBody UserIdsRequest request
+            @RequestBody List<Long> newMemberIds
     ) {
-        groupMemberService.addMembers(requesterId, groupId, request.getUserIds());
-        return ResponseEntity.ok(success());
+        groupMemberService.addMembers(requesterId, groupId, newMemberIds);
+        return ResponseEntity.ok(BaseResponse.ok());
     }
 
     /**
      * Member 강제 삭제
      */
     @DeleteMapping("/{groupId}/members")
-    public ResponseEntity<?> removeMember(
+    public ResponseEntity<BaseResponse> removeMember(
             @RequestParam Long requesterId,
             @PathVariable Long groupId,
-            @RequestBody UserIdsRequest request
+            @RequestBody List<Long> delMemberIds
     ) {
-        groupMemberService.removeMembers(requesterId, groupId, request.getUserIds());
-        return ResponseEntity.ok(success());
+        groupMemberService.removeMembers(requesterId, groupId, delMemberIds);
+        return ResponseEntity.ok(BaseResponse.ok());
     }
 
     /**
      * 본인 탈퇴
      */
     @DeleteMapping("/{groupId}/members/me")
-    public ResponseEntity<?> leaveGroup(
+    public ResponseEntity<BaseResponse> leaveGroup(
             @RequestParam Long requesterId,
             @PathVariable Long groupId
     ) {
         groupMemberService.leaveGroup(requesterId, groupId);
-        return ResponseEntity.ok(success());
-    }
-
-    /**
-     * 공통 응답
-     */
-    private static Res success() {
-        return new Res(true);
-    }
-
-    public static class Res {
-        private final boolean success;
-
-        public Res(final boolean success) {
-            this.success = success;
-        }
-
-        public boolean isSuccess() {
-            return success;
-        }
-    }
-
-    public static class UserIdsRequest {
-        private List<Long> userIds;
-
-        public List<Long> getUserIds() {
-            return userIds;
-        }
-    }
-
-    public static class ManagerIdsRequest {
-        private java.util.List<Long> managerIds;
-
-        public java.util.List<Long> getManagerIds() {
-            return managerIds;
-        }
-    }
-
-    public static class OwnerChangeRequest {
-        private Long newOwnerId;
-
-        public Long getNewOwnerId() {
-            return newOwnerId;
-        }
+        return ResponseEntity.ok(BaseResponse.ok());
     }
 }
 
