@@ -34,7 +34,10 @@ public class GroupController {
             @RequestParam Long requesterId,
             @RequestBody GroupCreateRequest request
     ) {
-        groupService.createGroup(requesterId, request);
+        Long createdGroupId = groupService.createGroup(requesterId, request);
+        System.out.println("!!!!created group id!!!!");
+        System.out.println(createdGroupId);
+
         return ResponseEntity.ok().body(success());
     }
 
@@ -47,13 +50,22 @@ public class GroupController {
             @RequestParam(required = false) String name
     ) {
         //test
-        List<GroupSummaryDto> tmpDtoList = groupService.searchMyGroups(requesterId, name);
+        List<GroupSummaryDto> tmpDtoList;
 
 
 
         if (name != null && !name.isBlank()) {
+
+            tmpDtoList = groupService.searchMyGroups(requesterId, name);
+
             return ResponseEntity.ok(groupService.searchMyGroups(requesterId, name));
         }
+
+        tmpDtoList = groupService.findMyGroups(requesterId);
+        for(GroupSummaryDto gsd : tmpDtoList){
+            System.out.println(gsd.toString());//test
+        }
+
         return ResponseEntity.ok(groupService.findMyGroups(requesterId));
     }
 

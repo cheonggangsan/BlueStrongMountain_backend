@@ -99,6 +99,14 @@ public class GroupServiceImpl implements GroupService {
             result.add(GroupSummaryDto.from(group, memberCount));
         }
 
+//        //test
+//        System.out.println("group size in findMyGroups = " + groups.size());
+//        for(Group group : groups){
+//            final int memberCount = userGroupRepository.countByGroupId(group.getId());
+//            System.out.println("group id : " +group.getId() + " memberCount = " + memberCount);
+//        }
+//        //test
+
         result.sort(Comparator.comparing(GroupSummaryDto::getUpdatedAt).reversed());
 
         return result;
@@ -163,7 +171,12 @@ public class GroupServiceImpl implements GroupService {
 
         final LocalDateTime now = LocalDateTime.now();
         group.changeOwner(newOwnerId, now);
-        groupRepository.save(group);
+
+//        //test
+//        System.out.println("before group size" + userGroupRepository.findByUserId(requesterId).size());
+//        groupRepository.save(group);
+//        System.out.println("after group size" + userGroupRepository.findByUserId(requesterId).size());
+//        //test
 
         final UserGroup oldOwner = userGroupRepository.findByUserIdAndGroupId(requesterId, groupId)
                 .orElseThrow(() -> new GroupNotFoundException(groupId));

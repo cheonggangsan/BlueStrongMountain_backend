@@ -20,8 +20,40 @@ public class InMemoryUserGroupRepository implements UserGroupRepository{
 
     @Override
     public UserGroup save(UserGroup userGroup) {
-        groups.computeIfAbsent(userGroup.getGroupId(), k -> new ArrayList<>()).add(userGroup);
-        users.computeIfAbsent(userGroup.getUserId(), k -> new ArrayList<>()).add(userGroup);
+//        groups.computeIfAbsent(userGroup.getGroupId(), k -> new ArrayList<>()).add(userGroup);
+//        users.computeIfAbsent(userGroup.getUserId(), k -> new ArrayList<>()).add(userGroup);
+
+        Long userId = userGroup.getUserId();
+        Long groupId = userGroup.getGroupId();
+
+        List<UserGroup> groupList = groups.getOrDefault(groupId, new ArrayList<>());
+        groupList.removeIf(ug -> ug.getUserId().equals(userId));
+
+        List<UserGroup> userList = users.getOrDefault(userId, new ArrayList<>());
+        userList.removeIf(ug -> ug.getGroupId().equals(groupId));
+
+        groupList.add(userGroup);
+        userList.add(userGroup);
+
+        groups.put(groupId, groupList);
+        users.put(userId, userList);
+
+//        //test
+//
+//        List<UserGroup> members = findByGroupIdAndRole(groupId, GroupRole.MEMBER);
+//        List<UserGroup> managers = findByGroupIdAndRole(groupId, GroupRole.MANAGER);
+//
+//        System.out.println("get members!!!!!!!!!!!1");
+//        for(UserGroup ug : members)
+//            System.out.println(ug.getUserId());
+//
+//        System.out.println("get managers!!!!!!!!!!!!");
+//        for(UserGroup ug : managers){
+//            System.out.println(ug.getUserId());
+//        }
+//
+//        //test
+
         return userGroup;
     }
 
@@ -84,7 +116,7 @@ public class InMemoryUserGroupRepository implements UserGroupRepository{
 
     @Override
     public int countByGroupId(Long groupId) {
-        return 0;
+        return findByGroupIdAndRole(groupId, GroupRole.MEMBER).size();
     }
 
     @Override

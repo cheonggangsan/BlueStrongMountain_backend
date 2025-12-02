@@ -2,8 +2,10 @@ package com.ssafy.BlueStrongMountain.dto;
 
 import com.ssafy.BlueStrongMountain.domain.Group;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class GroupSummaryDto {
 
     private Long id;
