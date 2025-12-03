@@ -78,21 +78,21 @@ public class BoardServiceImpl implements BoardService{
 
     @Override
     public void updateBoard(Long requesterId, Long groupId, Long boardId, BoardUpdateRequest request) {
-        Board old = boardRepository.findById(boardId)
+        Board currentBoard = boardRepository.findById(boardId)
                 .orElseThrow(() -> new RuntimeException("Board not found"));
 
-        if (LocalDateTime.now().isAfter(old.getEndTime())) {
+        if (LocalDateTime.now().isAfter(currentBoard.getEndTime())) {
             throw new RuntimeException("Deadline passed. Cannot update.");
         }
 
         // Immutable → 수정된 새 객체를 생성
-        Board updated = old.update(
+        Board updatedBoard = currentBoard.update(
                 request.getTitle(),
                 request.getEndTime(),
                 null
         );
 
-        boardRepository.save(updated);
+        boardRepository.save(updatedBoard);
 
         // 문제 목록 갱신
         boardProblemRepository.deleteByBoardId(boardId);
