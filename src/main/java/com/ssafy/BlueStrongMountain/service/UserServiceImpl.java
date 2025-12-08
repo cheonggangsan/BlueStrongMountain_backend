@@ -24,6 +24,7 @@ public class UserServiceImpl implements UserService{
                 .orElseThrow(UserNotFoundException::new);
         return new UserInfoResponse(
                 user.getId(), user.getEmail(), user.getUsername(),
+                user.getBaekjoonHandle(),
                 user.getStatus().name(), user.getCreatedAt(), user.getUpdatedAt()
         );
     }
