@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Repository
+//@Repository
 public class InMemoryUserRepository implements UserRepository{
 
     private final AtomicLong seq = new AtomicLong(0);
