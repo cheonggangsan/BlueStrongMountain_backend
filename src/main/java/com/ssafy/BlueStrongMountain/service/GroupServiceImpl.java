@@ -155,6 +155,10 @@ public class GroupServiceImpl implements GroupService {
                 now
         );
 
+        //test
+        System.out.println("update user!!!!! test");
+        System.out.println(group.toString());
+
         groupRepository.save(group);
     }
 
