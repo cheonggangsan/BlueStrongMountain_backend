@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.BlueStrongMountain.repository.mapper.GroupMapper">
+
+    <!-- ResultMap -->
+    <resultMap id="GroupMap" type="com.ssafy.BlueStrongMountain.domain.Group">
+        <id property="id" column="id"/>
+        <result property="title" column="name"/>
+        <result property="description" column="description"/>
+        <result property="visibility" column="visibility"/>
+        <result property="ownerId" column="owner_id"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- INSERT -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO groupz
+            (name, description, visibility, owner_id, created_at, updated_at)
+        VALUES
+            (#{title}, #{description}, #{visibility}, #{ownerId}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <!-- findById -->
+    <select id="findById" resultMap="GroupMap">
+        SELECT *
+        FROM groupz
+        WHERE id = #{id}
+    </select>
+
+    <!-- findByIds -->
+    <select id="findByIds" resultMap="GroupMap">
+        SELECT *
+        FROM groupz
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <!-- findByTitleLike -->
+    <select id="findByTitleLike" resultMap="GroupMap">
+        SELECT *
+        FROM groupz
+        WHERE LOWER(name) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+    </select>
+
+    <!-- UPDATE -->
+    <update id="update">
+        UPDATE groupz
+        SET
+            name = #{title},
+            description = #{description},
+            visibility = #{visibility},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+    <!-- DELETE -->
+    <delete id="delete">
+        DELETE FROM groupz
+        WHERE id = #{id}
+    </delete>
+
+</mapper>

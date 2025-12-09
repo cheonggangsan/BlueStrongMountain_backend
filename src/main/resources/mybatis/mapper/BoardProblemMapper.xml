@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.BlueStrongMountain.repository.mapper.BoardProblemMapper">
+
+    <resultMap id="BoardProblemMap" type="com.ssafy.BlueStrongMountain.domain.BoardProblem">
+        <id     property="id"         column="id"/>
+        <result property="boardId"    column="board_id"/>
+        <result property="problemId"  column="problem_id"/>
+        <result property="orderIndex" column="order_index"/>
+        <result property="createdAt"  column="created_at"/>
+        <result property="updatedAt"  column="updated_at"/>
+    </resultMap>
+
+    <!-- 단건 INSERT -->
+    <insert id="insert" parameterType="com.ssafy.BlueStrongMountain.domain.BoardProblem"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO board_problems
+            (board_id, problem_id, order_index, created_at, updated_at)
+        VALUES
+            (#{boardId}, #{problemId}, #{orderIndex}, #{createdAt}, #{updatedAt});
+    </insert>
+
+    <!-- bulk insert -->
+    <insert id="insertAll">
+        INSERT INTO board_problems
+        (board_id, problem_id, order_index, created_at, updated_at)
+        VALUES
+        <foreach collection="list" item="p" separator=",">
+            (#{p.boardId}, #{p.problemId}, #{p.orderIndex}, #{p.createdAt}, #{p.updatedAt})
+        </foreach>
+    </insert>
+
+    <!-- findByBoardId -->
+    <select id="findByBoardId" resultMap="BoardProblemMap">
+        SELECT *
+        FROM board_problems
+        WHERE board_id = #{boardId}
+        ORDER BY order_index ASC
+    </select>
+
+    <!-- deleteByBoardId -->
+    <delete id="deleteByBoardId">
+        DELETE FROM board_problems
+        WHERE board_id = #{boardId}
+    </delete>
+
+</mapper>
