@@ -5,9 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GroupRepository {
-    List<Long> findUserIdsByGroupId(Long groupId);
-    List<Long> findGroupSolvedProblems(Long groupId);
-    List<Long> findUsersSolvedProblems(Long groupId);
+//    List<Long> findUserIdsByGroupId(Long groupId);
+//    List<Long> findGroupSolvedProblems(Long groupId);
 
     Group save(Group group);
     Optional<Group> findById(Long groupId);
