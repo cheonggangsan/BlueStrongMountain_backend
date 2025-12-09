@@ -1,13 +1,8 @@
 package com.ssafy.BlueStrongMountain.domain;
 
 import lombok.Getter;
-
 import java.time.LocalDateTime;
 
-
-import lombok.Getter;
-
-import java.time.LocalDateTime;
 
 @Getter
 public final class Board {

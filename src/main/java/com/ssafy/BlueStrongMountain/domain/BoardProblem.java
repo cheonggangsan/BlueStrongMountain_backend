@@ -1,7 +1,6 @@
 package com.ssafy.BlueStrongMountain.domain;
 
 import lombok.Getter;
-
 import java.time.LocalDateTime;
 
 @Getter
