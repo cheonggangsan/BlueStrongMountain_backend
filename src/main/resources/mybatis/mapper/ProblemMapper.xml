@@ -13,7 +13,12 @@
         <result property="updatedAt" column="last_synced_at"/>
 
         <!-- tags (List<String>) -->
-        <collection property="tags" ofType="string" column="tag_name"/>
+<!--        <collection property="tags" ofType="string" column="tag_name"/>-->
+        <collection property="tags"
+                    javaType="java.util.ArrayList"
+                    ofType="java.lang.String">
+            <result column="tag_name"/>
+        </collection>
     </resultMap>
 
     <select id="findAll" resultMap="ProblemDtoMap">
