@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.BlueStrongMountain.repository.mapper.BoardMapper">
+
+    <resultMap id="BoardMap" type="com.ssafy.BlueStrongMountain.domain.Board">
+        <id     property="id"         column="id"/>
+        <result property="groupId"    column="group_id"/>
+        <result property="writerId"   column="writer_id"/>
+        <result property="title"      column="title"/>
+        <result property="content"    column="content"/>
+        <result property="startTime"  column="start_time"/>
+        <result property="endTime"    column="end_time"/>
+        <result property="viewCount"  column="view_count"/>
+        <result property="createdAt"  column="created_at"/>
+        <result property="updatedAt"  column="updated_at"/>
+    </resultMap>
+
+    <!-- INSERT -->
+    <insert id="insert" parameterType="com.ssafy.BlueStrongMountain.domain.Board" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO boards
+        (group_id, writer_id, title, content, start_time, end_time, view_count, created_at, updated_at)
+        VALUES
+            (#{groupId}, #{writerId}, #{title}, #{content}, #{startTime}, #{endTime},
+             #{viewCount}, #{createdAt}, #{updatedAt});
+    </insert>
+
+    <!-- UPDATE -->
+    <update id="update" parameterType="com.ssafy.BlueStrongMountain.domain.Board">
+        UPDATE boards
+        SET
+            title = #{title},
+            content = #{content},
+            end_time = #{endTime},
+            updated_at = #{updatedAt}
+        WHERE id = #{id}
+    </update>
+
+
+    <!-- findById -->
+    <select id="findById" resultMap="BoardMap">
+        SELECT *
+        FROM boards
+        WHERE id = #{id}
+    </select>
+
+    <!-- findByGroupId -->
+    <select id="findByGroupId" resultMap="BoardMap">
+        SELECT *
+        FROM boards
+        WHERE group_id = #{groupId}
+        ORDER BY id ASC
+    </select>
+
+    <!-- delete -->
+    <delete id="delete">
+        DELETE FROM boards WHERE id = #{id}
+    </delete>
+
+</mapper>
