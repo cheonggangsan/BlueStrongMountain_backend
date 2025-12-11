@@ -1,9 +1,6 @@
 package com.ssafy.BlueStrongMountain.controller;
 
-import com.ssafy.BlueStrongMountain.dto.BaseResponse;
-import com.ssafy.BlueStrongMountain.dto.GroupCreateRequest;
-import com.ssafy.BlueStrongMountain.dto.GroupSummaryDto;
-import com.ssafy.BlueStrongMountain.dto.GroupUpdateRequest;
+import com.ssafy.BlueStrongMountain.dto.*;
 import com.ssafy.BlueStrongMountain.service.GroupMemberService;
 import com.ssafy.BlueStrongMountain.service.GroupService;
 
@@ -35,6 +32,17 @@ public class GroupController {
         System.out.println(createdGroupId);
 
         return ResponseEntity.ok(BaseResponse.ok());
+    }
+
+    /**
+     * 그룹 상세조회
+     */
+    @GetMapping("/detail/{groupId}")
+    public ResponseEntity<GroupDetailDto> getGroupDetail(
+            @RequestParam Long requesterId,
+            @PathVariable Long groupId
+    ){
+        return ResponseEntity.ok(groupService.getGroupDetail(requesterId, groupId));
     }
 
     /**
