@@ -1,10 +1,8 @@
 package com.ssafy.BlueStrongMountain.service;
 
-import com.ssafy.BlueStrongMountain.domain.Group;
-import com.ssafy.BlueStrongMountain.domain.GroupRole;
-import com.ssafy.BlueStrongMountain.domain.GroupVisibility;
-import com.ssafy.BlueStrongMountain.domain.UserGroup;
+import com.ssafy.BlueStrongMountain.domain.*;
 import com.ssafy.BlueStrongMountain.dto.GroupCreateRequest;
+import com.ssafy.BlueStrongMountain.dto.GroupDetailDto;
 import com.ssafy.BlueStrongMountain.dto.GroupSummaryDto;
 import com.ssafy.BlueStrongMountain.dto.GroupUpdateRequest;
 import com.ssafy.BlueStrongMountain.exception.GroupNotFoundException;
@@ -79,6 +77,36 @@ public class GroupServiceImpl implements GroupService {
         }
 
         return saved.getId();
+    }
+
+    @Override
+    public GroupDetailDto getGroupDetail(final Long requesterId, final Long groupId){
+        groupAuthorityService.validateUserInGroup(requesterId, groupId);
+
+        Group findGroup = groupRepository.findById(groupId)
+                .orElseThrow(() -> new GroupNotFoundException(groupId));
+
+        List<Long> memberIds = userGroupRepository.findByGroupIdAndRole(groupId, GroupRole.MEMBER)
+                .stream()
+                .map(UserGroup::getUserId)
+                .toList();
+
+        List<Long> managerIds = userGroupRepository.findByGroupIdAndRole(groupId, GroupRole.MANAGER)
+                .stream()
+                .map(UserGroup::getUserId)
+                .toList();
+
+        return new GroupDetailDto(
+                findGroup.getId(),
+                findGroup.getTitle(),
+                findGroup.getDescription(),
+                findGroup.getOwnerId(),
+                managerIds,
+                memberIds,
+                findGroup.getVisibility().name(),
+                findGroup.getCreatedAt().toString(),
+                findGroup.getUpdatedAt().toString()
+        );
     }
 
     @Override
