@@ -78,7 +78,7 @@ public class AuthServiceImpl implements AuthService{
         String refreshToken = req.getRefreshToken();
 
         if(!jwtProvider.validateToken(refreshToken)){
-            //TODO 예외처리 추가
+            throw new InvalidTokenException();
         }
 
 
