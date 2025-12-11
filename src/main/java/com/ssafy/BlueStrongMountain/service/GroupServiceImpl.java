@@ -39,6 +39,13 @@ public class GroupServiceImpl implements GroupService {
         this.groupAuthorityService = groupAuthorityService;
     }
 
+    /**
+     * 새 그룹을 생성하고 그룹 소유자·관리자·구성원 연관 정보를 저장합니다.
+     *
+     * @param ownerId 그룹 소유자의 사용자 ID
+     * @param request 그룹 생성 요청 데이터(제목, 설명, 관리자 및 구성원 ID 목록 등)
+     * @return 생성된 그룹의 ID
+     */
     @Override
     public Long createGroup(
             final Long ownerId,
@@ -79,6 +86,14 @@ public class GroupServiceImpl implements GroupService {
         return saved.getId();
     }
 
+    /**
+     * 요청한 사용자가 속한 그룹의 상세 정보를 조회한다.
+     *
+     * @param requesterId 요청자 사용자 ID
+     * @param groupId 조회할 그룹의 ID
+     * @return 그룹 ID, 제목, 설명, 소유자 ID, 매니저 ID 목록, 멤버 ID 목록, 공개 범위 이름, 생성 시각 문자열, 수정 시각 문자열을 포함한 GroupDetailDto
+     * @throws GroupNotFoundException 지정한 ID의 그룹을 찾을 수 없을 때 발생
+     */
     @Override
     public GroupDetailDto getGroupDetail(final Long requesterId, final Long groupId){
         groupAuthorityService.validateUserInGroup(requesterId, groupId);
@@ -109,6 +124,15 @@ public class GroupServiceImpl implements GroupService {
         );
     }
 
+    /**
+     * 요청자가 속한 그룹들의 요약 정보를 멤버 수와 함께 최신 수정순으로 반환한다.
+     *
+     * 요청자의 그룹 참여 기록을 조회하여 각 그룹의 멤버 수를 계산하고
+     * GroupSummaryDto 목록으로 변환한 뒤 updatedAt 역순으로 정렬하여 반환한다.
+     *
+     * @param requesterId 조회를 요청한 사용자의 ID
+     * @return 요청자가 속한 그룹들의 요약 정보 목록 (`GroupSummaryDto`), updatedAt 기준 내림차순으로 정렬됨
+     */
     @Override
     public List<GroupSummaryDto> findMyGroups(final Long requesterId) {
         final List<Long> myGroupIds = userGroupRepository.findByUserId(requesterId).stream()

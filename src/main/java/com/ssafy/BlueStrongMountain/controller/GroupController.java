@@ -20,7 +20,11 @@ public class GroupController {
 
 
     /**
-     * 그룹 생성
+     * 새 그룹을 생성한다.
+     *
+     * @param requesterId 생성 요청을 한 사용자(요청자)의 ID
+     * @param request 생성에 필요한 그룹 정보
+     * @return 생성 결과를 담은 `BaseResponse` 객체
      */
     @PostMapping
     public ResponseEntity<BaseResponse> createGroup(
@@ -35,7 +39,11 @@ public class GroupController {
     }
 
     /**
-     * 그룹 상세조회
+     * 그룹의 상세 정보를 조회합니다.
+     *
+     * @param requesterId 요청자 회원의 ID
+     * @param groupId 조회할 그룹의 ID
+     * @return 그룹의 상세 정보를 담은 {@code GroupDetailDto}
      */
     @GetMapping("/detail/{groupId}")
     public ResponseEntity<GroupDetailDto> getGroupDetail(
@@ -163,4 +171,3 @@ public class GroupController {
         return ResponseEntity.ok(BaseResponse.ok());
     }
 }
-
