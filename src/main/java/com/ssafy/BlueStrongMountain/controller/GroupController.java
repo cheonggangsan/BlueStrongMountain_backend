@@ -37,7 +37,7 @@ public class GroupController {
     /**
      * 그룹 상세조회
      */
-    @GetMapping("/detail/{groupId}")
+    @GetMapping("/{groupId}/detail")
     public ResponseEntity<GroupDetailDto> getGroupDetail(
             @RequestParam Long requesterId,
             @PathVariable Long groupId
