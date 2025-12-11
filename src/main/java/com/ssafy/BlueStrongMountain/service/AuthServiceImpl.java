@@ -72,4 +72,22 @@ public class AuthServiceImpl implements AuthService{
         boolean isSameName = userRepository.findByUsername(username).isPresent();
         return new UsernameDuplicateResponse(username, isSameName);
     }
+
+    @Override
+    public void logout(LogoutRequest req) {
+        String refreshToken = req.getRefreshToken();
+
+        if(!jwtProvider.validateToken(refreshToken)){
+            //TODO 예외처리 추가
+        }
+
+
+        Long userId = jwtProvider.getUserIdFromToken(refreshToken);
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        user = user.withRefreshToken(null);
+
+        userRepository.save(user);
+    }
 }

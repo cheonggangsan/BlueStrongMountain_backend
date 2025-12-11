@@ -34,4 +34,12 @@ public class AuthController {
     ) {
         return ResponseEntity.ok(authService.checkUsername(username));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<BaseResponse> logout(
+            @RequestBody LogoutRequest req
+    ){
+        authService.logout(req);
+        return ResponseEntity.ok(BaseResponse.ok());
+    }
 }

@@ -56,4 +56,26 @@ public class JwtProvider {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
+
+    public boolean validateToken(String refreshToken){
+        try{
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(refreshToken);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+    public Long getUserIdFromToken(String refreshToken){
+        return Long.parseLong(
+                Jwts.parserBuilder()
+                        .setSigningKey(key)
+                        .build()
+                        .parseClaimsJws(refreshToken)
+                        .getBody()
+                        .getSubject()
+        );
+    }
 }
