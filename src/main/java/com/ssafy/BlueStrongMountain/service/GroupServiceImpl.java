@@ -44,7 +44,7 @@ public class GroupServiceImpl implements GroupService {
             final Long ownerId,
             final GroupCreateRequest request
     ) {
-        groupValidator.validateCreateRequest(request);
+        groupValidator.validateCreateRequest(ownerId, request);
 
         final LocalDateTime now = LocalDateTime.now();
         final GroupVisibility visibility = GroupVisibility.PRIVATE;
@@ -60,19 +60,22 @@ public class GroupServiceImpl implements GroupService {
         final Group saved = groupRepository.save(group);
 
         final UserGroup ownerUserGroup = UserGroup.create(ownerId, saved.getId(), GroupRole.OWNER, now);
-        userGroupRepository.save(ownerUserGroup);
+        //userGroupRepository.save(ownerUserGroup);
+        userGroupRepository.insert(ownerUserGroup);
 
         if (request.getManagerIds() != null) {
             for (Long managerId : request.getManagerIds()) {
                 final UserGroup userGroup = UserGroup.create(managerId, saved.getId(), GroupRole.MANAGER, now);
-                userGroupRepository.save(userGroup);
+                //userGroupRepository.save(userGroup);
+                userGroupRepository.insert(userGroup);
             }
         }
 
         if (request.getMemberIds() != null) {
             for (Long memberId : request.getMemberIds()) {
                 final UserGroup userGroup = UserGroup.create(memberId, saved.getId(), GroupRole.MEMBER, now);
-                userGroupRepository.save(userGroup);
+                //userGroupRepository.save(userGroup);
+                userGroupRepository.insert(userGroup);
             }
         }
 
@@ -183,9 +186,9 @@ public class GroupServiceImpl implements GroupService {
                 now
         );
 
-        //test
-        System.out.println("update user!!!!! test");
-        System.out.println(group.toString());
+//        //test
+//        System.out.println("update user!!!!! test");
+//        System.out.println(group.toString());
 
         groupRepository.save(group);
     }
@@ -198,11 +201,18 @@ public class GroupServiceImpl implements GroupService {
     ) {
         groupAuthorityService.validateOwnerTransferable(requesterId, groupId, newOwnerId);
 
-        final Group group = groupRepository.findById(groupId)
+        final Group findGroup = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupNotFoundException(groupId));
 
         final LocalDateTime now = LocalDateTime.now();
-        group.changeOwner(newOwnerId, now);
+        findGroup.changeOwner(newOwnerId, now);
+        groupRepository.save(findGroup);
+
+//        //test
+//        System.out.println("group update test!!!!!!!!!!!!!!!!");
+//        System.out.println(findGroup.toString());
+//        System.out.println("group update test_end!!!!!!!!!!!!!!!!");
+//        //test
 
 //        //test
 //        System.out.println("before group size" + userGroupRepository.findByUserId(requesterId).size());
@@ -213,11 +223,16 @@ public class GroupServiceImpl implements GroupService {
         final UserGroup oldOwner = userGroupRepository.findByUserIdAndGroupId(requesterId, groupId)
                 .orElseThrow(() -> new GroupNotFoundException(groupId));
         oldOwner.changeRole(GroupRole.MEMBER);
-        userGroupRepository.save(oldOwner);
+
+        userGroupRepository.updateRole(oldOwner);
 
         final UserGroup newOwner = userGroupRepository.findByUserIdAndGroupId(newOwnerId, groupId)
                 .orElseThrow(() -> new GroupNotFoundException(groupId));
         newOwner.changeRole(GroupRole.OWNER);
-        userGroupRepository.save(newOwner);
+
+        userGroupRepository.updateRole(newOwner);
+//
+//        userGroupRepository.save(oldOwner);
+//        userGroupRepository.save(newOwner);
     }
 }

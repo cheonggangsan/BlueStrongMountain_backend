@@ -93,8 +93,9 @@ public class GroupController {
     public ResponseEntity<BaseResponse> changeOwner(
             @RequestParam Long requesterId,
             @PathVariable Long groupId,
-            @RequestBody(required = true) Long newOwnerId
+            @RequestBody GroupChangeOwnerRequest req
     ) {
+        Long newOwnerId = req.getNewOwnerId();
         groupService.changeOwner(requesterId, groupId, newOwnerId);
         return ResponseEntity.ok(BaseResponse.ok());
     }
@@ -106,9 +107,9 @@ public class GroupController {
     public ResponseEntity<BaseResponse> addManager(
             @RequestParam Long requesterId,
             @PathVariable Long groupId,
-            @RequestBody List<Long> newManagerIds
+            @RequestBody GroupAddIdsRequest req
     ) {
-        groupMemberService.addManagers(requesterId, groupId, newManagerIds);
+        groupMemberService.addManagers(requesterId, groupId, req.getUserIds());
         return ResponseEntity.ok(BaseResponse.ok());
     }
 
@@ -132,9 +133,9 @@ public class GroupController {
     public ResponseEntity<BaseResponse> addMember(
             @RequestParam Long requesterId,
             @PathVariable Long groupId,
-            @RequestBody List<Long> newMemberIds
+            @RequestBody GroupAddIdsRequest req
     ) {
-        groupMemberService.addMembers(requesterId, groupId, newMemberIds);
+        groupMemberService.addMembers(requesterId, groupId, req.getUserIds());
         return ResponseEntity.ok(BaseResponse.ok());
     }
 

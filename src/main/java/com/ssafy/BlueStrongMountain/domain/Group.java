@@ -2,8 +2,10 @@ package com.ssafy.BlueStrongMountain.domain;
 
 import java.time.LocalDateTime;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class Group {
 
     private Long id;

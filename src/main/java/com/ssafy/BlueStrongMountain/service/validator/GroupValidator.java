@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GroupValidator {
 
-    public void validateCreateRequest(final GroupCreateRequest request) {
+    public void validateCreateRequest(final Long ownerId, final GroupCreateRequest request) {
         if (request == null) {
             throw new InvalidGroupCreateException("Request must not be null.");
         }
@@ -22,7 +22,7 @@ public class GroupValidator {
             throw new InvalidGroupCreateException("Group title must not be empty.");
         }
 
-        validateDuplicateIds(request.getManagerIds(), request.getMemberIds());
+        validateDuplicateIds(ownerId, request.getManagerIds(), request.getMemberIds());
     }
 
     public void validateUpdateRequest(final GroupUpdateRequest request) {
@@ -40,10 +40,13 @@ public class GroupValidator {
 //    }
 
     private void validateDuplicateIds(
+            final Long ownerId,
             final List<Long> managerIds,
             final List<Long> memberIds
     ) {
         final Set<Long> set = new HashSet<>();
+        set.add(ownerId);
+
         if (managerIds != null) {
             for (Long id : managerIds) {
                 if (set.contains(id)) {
