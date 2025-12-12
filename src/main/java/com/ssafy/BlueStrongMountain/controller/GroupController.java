@@ -93,8 +93,9 @@ public class GroupController {
     public ResponseEntity<BaseResponse> changeOwner(
             @RequestParam Long requesterId,
             @PathVariable Long groupId,
-            @RequestBody(required = true) Long newOwnerId
+            @RequestBody GroupChangeOwnerRequest req
     ) {
+        Long newOwnerId = req.getNewOwnerId();
         groupService.changeOwner(requesterId, groupId, newOwnerId);
         return ResponseEntity.ok(BaseResponse.ok());
     }
