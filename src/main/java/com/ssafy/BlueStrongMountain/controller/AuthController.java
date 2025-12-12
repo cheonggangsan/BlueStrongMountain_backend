@@ -2,6 +2,7 @@ package com.ssafy.BlueStrongMountain.controller;
 
 import com.ssafy.BlueStrongMountain.dto.*;
 import com.ssafy.BlueStrongMountain.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<BaseResponse> logout(
-            @RequestBody LogoutRequest req
+            @RequestBody @Valid LogoutRequest req
     ){
         authService.logout(req);
         return ResponseEntity.ok(BaseResponse.ok());
