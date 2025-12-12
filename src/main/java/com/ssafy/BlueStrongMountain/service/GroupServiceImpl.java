@@ -44,7 +44,7 @@ public class GroupServiceImpl implements GroupService {
             final Long ownerId,
             final GroupCreateRequest request
     ) {
-        groupValidator.validateCreateRequest(request);
+        groupValidator.validateCreateRequest(ownerId, request);
 
         final LocalDateTime now = LocalDateTime.now();
         final GroupVisibility visibility = GroupVisibility.PRIVATE;
