@@ -45,7 +45,8 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             }
 
             target.changeRole(GroupRole.MANAGER);
-            userGroupRepository.save(target);
+//            userGroupRepository.save(target);
+            userGroupRepository.updateRole(target);
         }
     }
 
@@ -69,8 +70,9 @@ public class GroupMemberServiceImpl implements GroupMemberService {
                 throw new CannotRemoveOwnerException(managerId, groupId);
             }
 
-            userGroup.changeRole(GroupRole.MEMBER);
-            userGroupRepository.save(userGroup);
+//            userGroup.changeRole(GroupRole.MEMBER);
+//            userGroupRepository.save(userGroup);
+            userGroupRepository.deleteByUserIdAndGroupId(managerId, groupId);
         }
     }
 
@@ -91,7 +93,8 @@ public class GroupMemberServiceImpl implements GroupMemberService {
 
             final LocalDateTime now = LocalDateTime.now();
             final UserGroup userGroup = UserGroup.create(userId, groupId, GroupRole.MEMBER, now);
-            userGroupRepository.save(userGroup);
+            //userGroupRepository.save(userGroup);
+            userGroupRepository.insert(userGroup);
         }
     }
 
