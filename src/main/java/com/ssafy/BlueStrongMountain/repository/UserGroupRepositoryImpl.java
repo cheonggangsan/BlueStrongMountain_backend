@@ -15,10 +15,20 @@ public class UserGroupRepositoryImpl implements UserGroupRepository {
 
     private final UserGroupMapper mapper;
 
+//    @Override
+//    public UserGroup save(UserGroup userGroup) {
+//        mapper.insert(userGroup);
+//        return userGroup;
+//    }
+
     @Override
-    public UserGroup save(UserGroup userGroup) {
+    public void insert(UserGroup userGroup) {
         mapper.insert(userGroup);
-        return userGroup;
+    }
+
+    @Override
+    public void updateRole(UserGroup userGroup) {
+        mapper.updateRole(userGroup.getUserId(), userGroup.getGroupId(), userGroup.getRole());
     }
 
     @Override
@@ -48,7 +58,9 @@ public class UserGroupRepositoryImpl implements UserGroupRepository {
 
     @Override
     public int countByGroupId(Long groupId) {
-        return mapper.countByGroupIdAndRole(groupId, GroupRole.MEMBER);
+        return mapper.countByGroupIdAndRole(groupId, GroupRole.MEMBER)
+                + mapper.countByGroupIdAndRole(groupId, GroupRole.MANAGER)
+                    + mapper.countByGroupIdAndRole(groupId, GroupRole.OWNER);
     }
 
     @Override

@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserGroupRepository {
-    UserGroup save(UserGroup userGroup);
+    //UserGroup save(UserGroup userGroup);
+    void insert(UserGroup userGroup);
+    void updateRole(UserGroup userGroup);
     List<UserGroup> findByUserId(Long userId);
     List<UserGroup> findByGroupId(Long groupId);
     Optional<UserGroup> findByUserIdAndGroupId(Long userId, Long groupId);
