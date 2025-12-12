@@ -55,6 +55,7 @@
             name = #{title},
             description = #{description},
             visibility = #{visibility},
+            owner_id = #{ownerId},
             updated_at = #{updatedAt}
         WHERE id = #{id}
     </update>
