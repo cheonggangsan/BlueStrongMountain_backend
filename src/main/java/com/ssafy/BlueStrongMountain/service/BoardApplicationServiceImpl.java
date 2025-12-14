@@ -1,6 +1,6 @@
 package com.ssafy.BlueStrongMountain.service;
 
-import com.ssafy.BlueStrongMountain.domain.Board;
+import com.ssafy.BlueStrongMountain.domain.BoardProblem;
 import com.ssafy.BlueStrongMountain.domain.BoardUserProgress;
 import com.ssafy.BlueStrongMountain.domain.BoardUserStatus;
 import com.ssafy.BlueStrongMountain.dto.*;
@@ -103,10 +103,15 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             Long boardId,
             BoardUpdateRequest req) {
 
+        BoardDetailResponse findBoard = boardService.getBoard(groupId, boardId);
+        if (LocalDateTime.now().isAfter(findBoard.getEndTime())) {
+            throw new RuntimeException("Deadline passed. Cannot update.");
+        }
+
         Set<Long> beforeProblemIds = new HashSet<>(
                 boardProblemRepository.findByBoardId(boardId)
                         .stream()
-                        .map(bp -> bp.getProblemId())
+                        .map(BoardProblem::getProblemId)
                         .toList()
         );
         Set<Long> afterProblemIds = new HashSet<>(req.getProblemIds());
@@ -124,8 +129,9 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
                 req
         );
 
-        boardUserProgressService.syncProblems(
+        boardUserProgressService.updateBoardProgress(
                 boardId,
+                groupId,
                 addedProblemIds.stream().toList(),
                 removedProblemIds.stream().toList()
         );
@@ -163,15 +169,17 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
         List<Long> pendingProblemIds =
                 boardUserProgressService.getPendingProblemIds(boardId, requesterId);
 
-        Set<Long> solved =
+        Set<Long> solvedProblemIds =
                 solvedAcSyncService.getSolvedProblemIds(requesterId);
 
         for(Long problemId : pendingProblemIds){
-            boardUserProgressService.markSolved(
-                    boardId,
-                    requesterId,
-                    problemId
-            );
+            if(solvedProblemIds.contains(problemId)){
+                boardUserProgressService.markSolved(
+                        boardId,
+                        requesterId,
+                        problemId
+                );
+            }
         }
     }
 }
