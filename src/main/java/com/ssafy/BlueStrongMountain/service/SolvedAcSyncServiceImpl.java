@@ -44,6 +44,9 @@ public class SolvedAcSyncServiceImpl implements SolvedAcSyncService{
         int page = 1;
         int totalCount = Integer.MAX_VALUE;
 
+        Set<Long> existingSolvedProblemIds = getSolvedProblemIds(userId);
+
+
         while((page - 1) * PAGE_SIZE < totalCount) {
             int finalPage = page;
             SolvedAcResponse response = webClient.get()
@@ -61,11 +64,10 @@ public class SolvedAcSyncServiceImpl implements SolvedAcSyncService{
 
 
 
-                if(userSolutionRepository
-                        .findByUserAndProblem(userId, problemId)
-                        .isPresent()){
+                if(existingSolvedProblemIds.contains(problemId)){
                     continue;
                 }
+
                 //DB에 userSolution 저장 로직
                 userSolutionRepository.save(
                         UserSolution.create(
