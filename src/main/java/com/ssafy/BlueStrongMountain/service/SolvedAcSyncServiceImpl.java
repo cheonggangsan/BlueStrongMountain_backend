@@ -44,8 +44,6 @@ public class SolvedAcSyncServiceImpl implements SolvedAcSyncService{
         int page = 1;
         int totalCount = Integer.MAX_VALUE;
 
-        List<Long> testProblemIds = new ArrayList<>();//test
-
         while((page - 1) * PAGE_SIZE < totalCount) {
             int finalPage = page;
             SolvedAcResponse response = webClient.get()
@@ -62,7 +60,6 @@ public class SolvedAcSyncServiceImpl implements SolvedAcSyncService{
                 Long problemId = item.getProblemId();
 
 
-                testProblemIds.add(problemId);//test
 
                 if(userSolutionRepository
                         .findByUserAndProblem(userId, problemId)
@@ -81,7 +78,6 @@ public class SolvedAcSyncServiceImpl implements SolvedAcSyncService{
             page++;
         }
 
-//        //test
 //        System.out.println(testProblemIds.size());
 //        for(Long pid : testProblemIds){
 //            System.out.print(pid + " ");
@@ -89,7 +85,6 @@ public class SolvedAcSyncServiceImpl implements SolvedAcSyncService{
 //        System.out.println();
 //
 //
-//        //test
 
     }
 
