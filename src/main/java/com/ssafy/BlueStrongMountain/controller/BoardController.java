@@ -1,24 +1,20 @@
 package com.ssafy.BlueStrongMountain.controller;
 
-import com.ssafy.BlueStrongMountain.dto.BoardCreateRequest;
-import com.ssafy.BlueStrongMountain.dto.BoardSearchCondition;
-import com.ssafy.BlueStrongMountain.dto.BoardUpdateRequest;
-import com.ssafy.BlueStrongMountain.dto.BoardDetailResponse;
-import com.ssafy.BlueStrongMountain.dto.BoardResponse;
+import com.ssafy.BlueStrongMountain.dto.*;
+import com.ssafy.BlueStrongMountain.service.BoardApplicationService;
 import com.ssafy.BlueStrongMountain.service.BoardService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/groups/{groupId}/boards")
+@RequiredArgsConstructor
 public class BoardController {
 
+    private final BoardApplicationService boardApplicationService;
     private final BoardService boardService;
-
-    public BoardController(BoardService boardService) {
-        this.boardService = boardService;
-    }
 
     /**
      * POST /api/v1/groups/{groupId}/boards
@@ -31,9 +27,9 @@ public class BoardController {
             @RequestBody BoardCreateRequest request
     ) {
         //return boardService.createBoard(requesterId, groupId, request);
-        Long tmp = boardService.createBoard(requesterId, groupId, request);
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        System.out.println(tmp);//test
+        Long tmp = boardApplicationService.createBoard(requesterId, groupId, request);
+//        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+//        System.out.println(tmp);
 
         return tmp;
     }
@@ -63,6 +59,20 @@ public class BoardController {
     }
 
     /**
+     * GET /api/v1/groups/{groupId}/boards/{boardId}/userStatus
+     * 유저 풀이 여부 조회
+     */
+    @GetMapping("/{boardId}/userStatus")
+    public BoardProgressResponse getBoardUserStatus(
+            @RequestParam Long requesterId,
+            @PathVariable Long groupId,
+            @PathVariable Long boardId
+    ){
+        return boardApplicationService.getBoardProgress(requesterId, groupId, boardId);
+    }
+
+
+    /**
      * PATCH /api/v1/groups/{groupId}/boards/{boardId}
      * 보드 수정
      */
@@ -73,7 +83,7 @@ public class BoardController {
             @RequestParam Long requesterId,
             @RequestBody BoardUpdateRequest request
     ) {
-        boardService.updateBoard(requesterId, groupId, boardId, request);
+        boardApplicationService.updateBoard(requesterId, groupId, boardId, request);
     }
 
     /**
@@ -86,6 +96,6 @@ public class BoardController {
             @PathVariable Long boardId,
             @RequestParam Long requesterId
     ) {
-        boardService.deleteBoard(requesterId, groupId, boardId);
+        boardApplicationService.deleteBoard(requesterId, groupId, boardId);
     }
 }
