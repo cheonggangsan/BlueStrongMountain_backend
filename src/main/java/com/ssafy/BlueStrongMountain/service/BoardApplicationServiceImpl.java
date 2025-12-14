@@ -34,6 +34,11 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             Long requesterId,
             Long groupId,
             BoardCreateRequest req) {
+
+        if(LocalDateTime.now().isAfter(req.getEndTime())){
+            throw new RuntimeException("update Deadline should not before than startTime");
+        }
+
         Long boardId
                 = boardService.createBoard(
                         requesterId,
@@ -106,6 +111,9 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
         BoardDetailResponse findBoard = boardService.getBoard(groupId, boardId);
         if (LocalDateTime.now().isAfter(findBoard.getEndTime())) {
             throw new RuntimeException("Deadline passed. Cannot update.");
+        }
+        if(LocalDateTime.now().isAfter(req.getEndTime())){
+            throw new RuntimeException("update Deadline should not before than startTime");
         }
 
         Set<Long> beforeProblemIds = new HashSet<>(
