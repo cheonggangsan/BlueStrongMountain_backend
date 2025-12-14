@@ -152,7 +152,11 @@ public class BoardUserProgressServiceImpl implements BoardUserProgressService {
                         progressRepository.findUserIdsByBoardAndProblem(boardId, problemId);
 
                 for (Long userId : userIds) {
-                    progressRepository.deleteByBoardAndUser(boardId, userId);
+                    progressRepository.deleteByBoardAndUserAndProblem(
+                            boardId,
+                            userId,
+                            problemId
+                    );
                 }
             }
         }
