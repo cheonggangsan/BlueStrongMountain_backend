@@ -1274,6 +1274,10 @@ components:
         endTime:
           type: string
           format: date-time
+        problemIds:
+          type: array
+          items:
+            type: integer
 
     BoardResponse:
       type: object
