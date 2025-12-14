@@ -5,6 +5,8 @@ import com.ssafy.BlueStrongMountain.domain.BoardProblem;
 import com.ssafy.BlueStrongMountain.dto.*;
 import com.ssafy.BlueStrongMountain.repository.BoardProblemRepository;
 import com.ssafy.BlueStrongMountain.repository.BoardRepository;
+import com.ssafy.BlueStrongMountain.repository.BoardUserProgressRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -13,15 +15,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class BoardServiceImpl implements BoardService{
     private final BoardRepository boardRepository;
     private final BoardProblemRepository boardProblemRepository;
 
-    public BoardServiceImpl(BoardRepository boardRepository,
-                            BoardProblemRepository boardProblemRepository) {
-        this.boardRepository = boardRepository;
-        this.boardProblemRepository = boardProblemRepository;
-    }
+
     @Override
     public Long createBoard(Long requesterId, Long groupId, BoardCreateRequest request) {
 
