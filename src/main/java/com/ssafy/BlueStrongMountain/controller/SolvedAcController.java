@@ -39,7 +39,7 @@ public class SolvedAcController {
      * 유저가 푼 문제 ID 목록 조회
      *
      * 예:
-     * GET /api/v1/user-solutions/solved?userId=1
+     * GET /api/test/solvedac/solved?userId=1
      */
     @GetMapping("/solved")
     public ResponseEntity<Set<Long>> getSolvedProblemIds(
