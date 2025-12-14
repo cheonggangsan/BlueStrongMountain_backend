@@ -135,17 +135,15 @@ public class BoardUserProgressServiceImpl implements BoardUserProgressService {
      * 동기화 (보드 수정)
      * =============================== */
 
-    //TODO 메서드 이름 update로 변경하고 로직 수정해야 함
     @Override
-    public void syncProblems(
+    public void updateBoardProgress(
             Long boardId,
+            Long groupId,
             List<Long> addedProblemIds,
             List<Long> removedProblemIds
     ) {
         if (addedProblemIds != null && !addedProblemIds.isEmpty()) {
-            throw new IllegalStateException(
-                    "syncProblems: addedProblemIds는 initializeBoardProgress를 통해 처리되어야 합니다."
-            );
+            initializeBoardProgress(boardId, groupId, addedProblemIds);
         }
 
         if (removedProblemIds != null && !removedProblemIds.isEmpty()) {

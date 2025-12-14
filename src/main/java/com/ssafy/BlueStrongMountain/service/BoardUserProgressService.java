@@ -1,7 +1,6 @@
 package com.ssafy.BlueStrongMountain.service;
 
 import com.ssafy.BlueStrongMountain.domain.BoardUserProgress;
-import com.ssafy.BlueStrongMountain.domain.BoardUserStatus;
 
 import java.util.List;
 
@@ -58,8 +57,9 @@ public interface BoardUserProgressService {
      * 동기화 (보드 수정 등)
      * =============================== */
 
-    void syncProblems(
+    void updateBoardProgress(
             Long boardId,
+            Long groupId,
             List<Long> addedProblemIds,
             List<Long> removedProblemIds
     );
