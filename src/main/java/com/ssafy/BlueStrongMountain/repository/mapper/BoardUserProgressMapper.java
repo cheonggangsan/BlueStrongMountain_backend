@@ -111,4 +111,8 @@ public interface BoardUserProgressMapper {
             @Param("userId") Long userId
     );
 
+    void deleteByBoardAndUserAndProblem(
+            @Param("boardId") Long boardId,
+            @Param("userId") Long userId,
+            @Param("problemId") Long problemId);
 }

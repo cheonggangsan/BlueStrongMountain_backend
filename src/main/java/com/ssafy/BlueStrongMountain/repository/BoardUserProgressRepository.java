@@ -100,4 +100,10 @@ public interface BoardUserProgressRepository {
     void deleteByBoard(Long boardId);
 
     void deleteByBoardAndUser(Long boardId, Long userId);
+
+    void deleteByBoardAndUserAndProblem(
+            Long boardId,
+            Long userId,
+            Long problemId
+    );
 }

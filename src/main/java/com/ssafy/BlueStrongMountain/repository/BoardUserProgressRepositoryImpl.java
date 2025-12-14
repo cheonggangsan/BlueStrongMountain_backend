@@ -166,4 +166,13 @@ public class BoardUserProgressRepositoryImpl
     public void deleteByBoardAndUser(Long boardId, Long userId) {
         mapper.deleteByBoardAndUser(boardId, userId);
     }
+
+    @Override
+    public void deleteByBoardAndUserAndProblem(Long boardId, Long userId, Long problemId) {
+        mapper.deleteByBoardAndUserAndProblem(
+                boardId,
+                userId,
+                problemId
+        );
+    }
 }

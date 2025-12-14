@@ -211,4 +211,11 @@
           AND user_id = #{userId}
     </delete>
 
+    <delete id="deleteByBoardAndUserAndProblem">
+        DELETE FROM board_user_progress
+        WHERE board_id = #{boardId}
+          AND user_id = #{userId}
+          AND problem_id = #{problemId}
+    </delete>
+
 </mapper>
