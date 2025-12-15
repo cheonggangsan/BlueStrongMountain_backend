@@ -102,11 +102,11 @@ public interface BoardUserProgressMapper {
      * DELETE
      * ================================================== */
 
-    int deleteByBoard(
+    void deleteByBoard(
             @Param("boardId") Long boardId
     );
 
-    int deleteByBoardAndUser(
+    void deleteByBoardAndUser(
             @Param("boardId") Long boardId,
             @Param("userId") Long userId
     );
