@@ -113,7 +113,7 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             throw new RuntimeException("Deadline passed. Cannot update.");
         }
         if(LocalDateTime.now().isAfter(req.getEndTime())){
-            throw new RuntimeException("update Deadline should not before than startTime");
+            throw new RuntimeException("End time must be after current time");
         }
 
         Set<Long> beforeProblemIds = new HashSet<>(
