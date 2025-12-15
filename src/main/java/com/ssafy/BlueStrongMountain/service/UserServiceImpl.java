@@ -2,6 +2,7 @@ package com.ssafy.BlueStrongMountain.service;
 
 import com.ssafy.BlueStrongMountain.domain.User;
 import com.ssafy.BlueStrongMountain.dto.UserInfoResponse;
+import com.ssafy.BlueStrongMountain.dto.UserSimpleDto;
 import com.ssafy.BlueStrongMountain.exception.InvalidPasswordException;
 import com.ssafy.BlueStrongMountain.exception.UserHasGroupException;
 import com.ssafy.BlueStrongMountain.exception.UserNotFoundException;
@@ -10,6 +11,11 @@ import com.ssafy.BlueStrongMountain.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @AllArgsConstructor
@@ -28,6 +34,35 @@ public class UserServiceImpl implements UserService{
                 user.getStatus().name(), user.getCreatedAt(), user.getUpdatedAt()
         );
     }
+
+    @Override
+    public List<UserSimpleDto> searchUsersByKeyword(String keyword) {
+        List<UserSimpleDto> ret = new ArrayList<>();
+
+        Map<Long, UserSimpleDto> resultMap = new HashMap<>();
+
+        userRepository.searchByUsername(keyword)
+                .forEach(u -> resultMap.put(
+                        u.getId(),
+                        UserSimpleDto.from(
+                                u.getId(),
+                                u.getEmail(),
+                                u.getUsername()
+                        )
+                ));
+        userRepository.searchByEmail(keyword)
+                .forEach(u -> resultMap.put(
+                        u.getId(),
+                        UserSimpleDto.from(
+                                u.getId(),
+                                u.getEmail(),
+                                u.getUsername()
+                        )
+                ));
+
+        return new ArrayList<>(resultMap.values());
+    }
+
 
     @Override
     public void changeUsername(Long userId, String newName) {
