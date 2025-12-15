@@ -5,6 +5,7 @@ import com.ssafy.BlueStrongMountain.repository.mapper.UserMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -31,6 +32,16 @@ public class UserRepositoryImpl implements UserRepository{
     @Override
     public Optional<User> findByUsername(String username) {
         return Optional.ofNullable(mapper.findByUsername(username));
+    }
+
+    @Override
+    public List<User> searchByEmail(String keyword) {
+        return mapper.searchByEmail(keyword);
+    }
+
+    @Override
+    public List<User> searchByUsername(String keyword) {
+        return mapper.searchByUsername(keyword);
     }
 
     @Override
