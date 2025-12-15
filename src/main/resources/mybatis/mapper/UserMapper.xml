@@ -45,6 +45,14 @@
     <select id="findByEmail" resultMap="UserResultMap">
         SELECT * FROM users WHERE email = #{email}
     </select>
+    
+    <select id="searchByEmail" resultMap="UserResultMap">
+        SELECT * FROM users WHERE email LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
+    <select id="searchByUsername" resultMap="UserResultMap">
+        SELECT * FROM users WHERE email LIKE CONCAT('%', #{keyword}, '%')
+    </select>
 
     <select id="findByUsername" resultMap="UserResultMap">
         SELECT * FROM users WHERE username = #{username}

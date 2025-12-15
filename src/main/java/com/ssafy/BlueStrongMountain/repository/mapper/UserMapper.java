@@ -4,6 +4,8 @@ import com.ssafy.BlueStrongMountain.domain.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper {
     void insert(User user);
@@ -15,6 +17,10 @@ public interface UserMapper {
     User findByEmail(@Param("email") String email);
 
     User findByUsername(@Param("username") String username);
+
+    List<User> searchByEmail(@Param("keyword") String keyword);
+
+    List<User> searchByUsername(@Param("keyword") String keyword);
 
     void delete(@Param("id") Long id);
 }
