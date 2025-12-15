@@ -1,5 +1,6 @@
 package com.ssafy.BlueStrongMountain.domain;
 
+import com.ssafy.BlueStrongMountain.domain.policy.BoardTimePolicy;
 import lombok.Getter;
 import java.time.LocalDateTime;
 
@@ -51,6 +52,10 @@ public final class Board {
 
         LocalDateTime now = LocalDateTime.now();
 
+        LocalDateTime resolvedEndTime =
+                endTime != null ? endTime : BoardTimePolicy.NO_DEADLINE;
+
+
         return new Board(
                 null,
                 groupId,
@@ -58,7 +63,7 @@ public final class Board {
                 title,
                 content,
                 now,
-                endTime,
+                resolvedEndTime,
                 0,
                 now,
                 null
@@ -83,6 +88,9 @@ public final class Board {
 
     // 수정: 불변 객체 → 수정 시 새 객체를 리턴하는 방식
     public Board update(String title, LocalDateTime endTime, String content) {
+        LocalDateTime resolvedEndTime =
+                endTime != null ? endTime : BoardTimePolicy.NO_DEADLINE;
+
         return new Board(
                 this.id,
                 this.groupId,
@@ -90,7 +98,7 @@ public final class Board {
                 title,
                 content,
                 this.startTime,
-                endTime,
+                resolvedEndTime,
                 this.viewCount,
                 this.createdAt,
                 LocalDateTime.now()

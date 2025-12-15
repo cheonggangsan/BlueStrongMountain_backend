@@ -7,22 +7,19 @@ import java.time.LocalDateTime;
 @Getter
 public class BoardUserProgress {
 
-    public enum Status {
-        PENDING, SOLVED
-    }
 
     private Long id;
     private Long boardId;
     private Long userId;
     private Long problemId;
-    private Status status;
+    private BoardUserStatus status;
     private LocalDateTime solvedAt;
 
     public BoardUserProgress(Long boardId, Long userId, Long problemId) {
         this.boardId = boardId;
         this.userId = userId;
         this.problemId = problemId;
-        this.status = Status.PENDING;
+        this.status = BoardUserStatus.PENDING;
     }
 
     public void assignId(Long id) {
@@ -30,7 +27,7 @@ public class BoardUserProgress {
     }
 
     public void markSolved() {
-        this.status = Status.SOLVED;
+        this.status = BoardUserStatus.SOLVED;
         this.solvedAt = LocalDateTime.now();
     }
 }

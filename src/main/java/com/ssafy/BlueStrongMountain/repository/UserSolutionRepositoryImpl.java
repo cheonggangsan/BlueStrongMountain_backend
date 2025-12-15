@@ -16,6 +16,11 @@ public class UserSolutionRepositoryImpl implements UserSolutionRepository {
 
     @Override
     public UserSolution save(UserSolution userSolution) {
+        Optional<UserSolution> existingUserSolution
+                = findByUserAndProblem(userSolution.getUserId(), userSolution.getProblemId());
+        if(existingUserSolution.isPresent()){
+            return existingUserSolution.get();
+        }
         mapper.save(userSolution);
         return userSolution;
     }

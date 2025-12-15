@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.BlueStrongMountain.repository.mapper.BoardUserProgressMapper">
+
+    <!-- ==================================================
+     * ResultMap
+     * ================================================== -->
+    <resultMap id="BoardUserProgressMap"
+               type="com.ssafy.BlueStrongMountain.domain.BoardUserProgress">
+        <id property="id" column="id"/>
+        <result property="boardId" column="board_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="problemId" column="problem_id"/>
+        <result property="status" column="status"/>
+        <result property="solvedAt" column="solved_at"/>
+    </resultMap>
+
+    <!-- ==================================================
+     * 단건 조회 / 검증
+     * ================================================== -->
+    <select id="findByBoardUserProblem"
+            resultMap="BoardUserProgressMap">
+        SELECT
+            id,
+            board_id,
+            user_id,
+            problem_id,
+            status,
+            solved_at
+        FROM board_user_progress
+        WHERE board_id = #{boardId}
+            AND user_id = #{userId}
+            AND problem_id = #{problemId}
+    </select>
+
+    <!-- ==================================================
+     * INSERT
+     * ================================================== -->
+    <insert id="insert"
+            parameterType="com.ssafy.BlueStrongMountain.domain.BoardUserProgress"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO board_user_progress (
+             board_id,
+             user_id,
+             problem_id,
+             status,
+             solved_at
+        ) VALUES (
+             #{boardId},
+             #{userId},
+             #{problemId},
+             #{status},
+             #{solvedAt}
+        )
+    </insert>
+
+    <insert id="insertAll">
+        INSERT INTO board_user_progress (
+        board_id,
+        user_id,
+        problem_id,
+        status,
+        solved_at
+        )
+        VALUES
+        <foreach collection="progresses"
+                 item="p"
+                 separator=",">
+            (
+            #{p.boardId},
+            #{p.userId},
+            #{p.problemId},
+            #{p.status},
+            #{p.solvedAt}
+            )
+        </foreach>
+    </insert>
+
+    <!-- ==================================================
+     * UPDATE
+     * ================================================== -->
+
+    <update id="updateStatus">
+        UPDATE board_user_progress
+        SET
+        status = #{status},
+        solved_at =
+        <choose>
+            <when test="status == 'SOLVED'">
+                #{solvedAt}
+            </when>
+            <otherwise>
+                NULL
+            </otherwise>
+        </choose>
+        WHERE board_id = #{boardId}
+        AND user_id = #{userId}
+        AND problem_id = #{problemId}
+    </update>
+
+    <!-- ==================================================
+     * board + user → problem
+     * ================================================== -->
+    <select id="findProblemIdsByBoardAndUser"
+            resultType="long">
+        SELECT problem_id
+        FROM board_user_progress
+        WHERE board_id = #{boardId}
+          AND user_id = #{userId}
+    </select>
+
+    <select id="findProblemIdsByBoardAndUserAndStatus"
+            resultType="long">
+        SELECT problem_id
+        FROM board_user_progress
+        WHERE board_id = #{boardId}
+          AND user_id = #{userId}
+          AND status = #{status}
+    </select>
+
+    <!-- ==================================================
+     * board + problem → user
+     * ================================================== -->
+    <select id="findUserIdsByBoardAndProblem"
+            resultType="long">
+        SELECT user_id
+        FROM board_user_progress
+        WHERE board_id = #{boardId}
+          AND problem_id = #{problemId}
+    </select>
+
+    <select id="findUserIdsByBoardAndProblemAndStatus"
+            resultType="long">
+        SELECT user_id
+        FROM board_user_progress
+        WHERE board_id = #{boardId}
+          AND problem_id = #{problemId}
+          AND status = #{status}
+    </select>
+
+    <!-- ==================================================
+     * board → user / problem
+     * ================================================== -->
+    <select id="findUserIdsByBoard"
+            resultType="long">
+        SELECT DISTINCT user_id
+        FROM board_user_progress
+        WHERE board_id = #{boardId}
+    </select>
+
+    <select id="findUserIdsByBoardAndStatus"
+            resultType="long">
+        SELECT DISTINCT user_id
+        FROM board_user_progress
+        WHERE board_id = #{boardId}
+          AND status = #{status}
+    </select>
+
+    <select id="findProblemIdsByBoard"
+            resultType="long">
+        SELECT DISTINCT problem_id
+        FROM board_user_progress
+        WHERE board_id = #{boardId}
+    </select>
+
+    <!-- ==================================================
+     * row 단위 조회
+     * ================================================== -->
+    <select id="findAllByBoardAndUser"
+            resultMap="BoardUserProgressMap">
+        SELECT
+            id,
+            board_id,
+            user_id,
+            problem_id,
+            status,
+            solved_at
+        FROM board_user_progress
+        WHERE board_id = #{boardId}
+          AND user_id = #{userId}
+    </select>
+
+    <select id="findAllByBoard"
+            resultMap="BoardUserProgressMap">
+        SELECT
+            id,
+            board_id,
+            user_id,
+            problem_id,
+            status,
+            solved_at
+        FROM board_user_progress
+        WHERE board_id = #{boardId}
+    </select>
+
+    <!-- ==================================================
+     * DELETE
+     * ================================================== -->
+    <delete id="deleteByBoard">
+        DELETE FROM board_user_progress
+        WHERE board_id = #{boardId}
+    </delete>
+
+    <delete id="deleteByBoardAndUser">
+        DELETE FROM board_user_progress
+        WHERE board_id = #{boardId}
+          AND user_id = #{userId}
+    </delete>
+
+    <delete id="deleteByBoardAndUserAndProblem">
+        DELETE FROM board_user_progress
+        WHERE board_id = #{boardId}
+          AND user_id = #{userId}
+          AND problem_id = #{problemId}
+    </delete>
+
+</mapper>
