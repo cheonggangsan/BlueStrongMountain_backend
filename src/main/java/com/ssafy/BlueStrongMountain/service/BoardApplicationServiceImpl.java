@@ -4,8 +4,10 @@ import com.ssafy.BlueStrongMountain.domain.BoardProblem;
 import com.ssafy.BlueStrongMountain.domain.BoardUserProgress;
 import com.ssafy.BlueStrongMountain.domain.BoardUserStatus;
 import com.ssafy.BlueStrongMountain.dto.*;
+import com.ssafy.BlueStrongMountain.exception.GroupNotFoundException;
 import com.ssafy.BlueStrongMountain.repository.BoardProblemRepository;
 import com.ssafy.BlueStrongMountain.repository.BoardUserProgressRepository;
+import com.ssafy.BlueStrongMountain.repository.GroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
     private final BoardUserProgressService boardUserProgressService;
 
     private final BoardProblemRepository boardProblemRepository;
+    private final GroupRepository groupRepository;
 
 
     private final BoardUserProgressRepository boardUserProgressRepository;
@@ -35,7 +38,12 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             Long groupId,
             BoardCreateRequest req) {
 
-        if(LocalDateTime.now().isAfter(req.getEndTime())){
+        //groupId 검증
+        if(!groupRepository.findById(groupId).isPresent()){
+            throw new GroupNotFoundException(groupId);
+        }
+
+        if(req.getEndTime() != null && LocalDateTime.now().isAfter(req.getEndTime())){
             throw new RuntimeException("Deadline should not be in the past");
         }
 
@@ -59,6 +67,8 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             Long requesterId,
             Long groupId,
             Long boardId) {
+        //groupId에 대한 로직이 따로 없음
+
         List<BoardUserProgress> progresses =
                 boardUserProgressService.getProgressByBoard(boardId);
 
@@ -107,12 +117,17 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             Long groupId,
             Long boardId,
             BoardUpdateRequest req) {
+        //groupId 검증
+        if(!groupRepository.findById(groupId).isPresent()){
+            throw new GroupNotFoundException(groupId);
+        }
 
         BoardDetailResponse findBoard = boardService.getBoard(groupId, boardId);
+
         if (LocalDateTime.now().isAfter(findBoard.getEndTime())) {
             throw new RuntimeException("Deadline passed. Cannot update.");
         }
-        if(LocalDateTime.now().isAfter(req.getEndTime())){
+        if(req.getEndTime() != null && LocalDateTime.now().isAfter(req.getEndTime())){
             throw new RuntimeException("End time must be after current time");
         }
 
@@ -150,6 +165,10 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             Long requesterId,
             Long groupId,
             Long boardId) {
+        //groupId 검증
+        if(!groupRepository.findById(groupId).isPresent()){
+            throw new GroupNotFoundException(groupId);
+        }
         boardUserProgressService.deleteByBoard(boardId);
 
         boardService.deleteBoard(

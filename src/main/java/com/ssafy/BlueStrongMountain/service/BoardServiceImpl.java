@@ -3,6 +3,7 @@ package com.ssafy.BlueStrongMountain.service;
 import com.ssafy.BlueStrongMountain.domain.Board;
 import com.ssafy.BlueStrongMountain.domain.BoardProblem;
 import com.ssafy.BlueStrongMountain.dto.*;
+import com.ssafy.BlueStrongMountain.exception.BoardNotFoundException;
 import com.ssafy.BlueStrongMountain.repository.BoardProblemRepository;
 import com.ssafy.BlueStrongMountain.repository.BoardRepository;
 import com.ssafy.BlueStrongMountain.repository.BoardUserProgressRepository;
@@ -59,7 +60,8 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public BoardDetailResponse getBoard(Long groupId, Long boardId) {
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new RuntimeException("Board not found"));
+                //.orElseThrow(() -> new RuntimeException("Board not found"));
+                .orElseThrow(BoardNotFoundException::new);
 
         List<Long> problemIds = boardProblemRepository.findByBoardId(boardId)
                 .stream()
@@ -80,9 +82,9 @@ public class BoardServiceImpl implements BoardService{
         Board currentBoard = boardRepository.findById(boardId)
                 .orElseThrow(() -> new RuntimeException("Board not found"));
 
-        if (LocalDateTime.now().isAfter(currentBoard.getEndTime())) {
-            throw new RuntimeException("Deadline passed. Cannot update.");
-        }
+//        if (LocalDateTime.now().isAfter(currentBoard.getEndTime())) {
+//            throw new RuntimeException("Deadline passed. Cannot update.");
+//        }
 
         // Immutable → 수정된 새 객체를 생성
         Board updatedBoard = currentBoard.update(
