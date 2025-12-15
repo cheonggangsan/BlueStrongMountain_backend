@@ -80,7 +80,7 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public void updateBoard(Long requesterId, Long groupId, Long boardId, BoardUpdateRequest request) {
         Board currentBoard = boardRepository.findById(boardId)
-                .orElseThrow(() -> new RuntimeException("Board not found"));
+                .orElseThrow(BoardNotFoundException::new);
 
 //        if (LocalDateTime.now().isAfter(currentBoard.getEndTime())) {
 //            throw new RuntimeException("Deadline passed. Cannot update.");
