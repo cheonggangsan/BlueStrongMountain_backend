@@ -544,12 +544,16 @@ paths:
       tags:
         - Board
       summary: Search boards with conditions
+      description: >
+        조건에 따라 그룹 내 게시판 목록을 조회합니다.
+        각 게시판에는 포함된 문제 개수가 함께 반환됩니다.
       parameters:
         - in: path
           name: groupId
+          required: true
           schema:
             type: integer
-          required: true
+            format: int64
         - in: query
           name: title
           schema:
@@ -558,6 +562,7 @@ paths:
           name: writerId
           schema:
             type: integer
+            format: int64
         - in: query
           name: from
           schema:
@@ -581,9 +586,11 @@ paths:
                 - boardId: 1
                   title: "DP 세션"
                   endTime: "2025-01-01T10:00:00"
+                  problemsCount: 5
                 - boardId: 2
                   title: "DP 세션2"
                   endTime: "2025-01-03T15:00:00"
+                  problemsCount: 8
 
   /api/v1/groups/{groupId}/boards/{boardId}:
     get:
@@ -1321,20 +1328,26 @@ components:
           items:
             type: integer
 
+
     BoardResponse:
       type: object
       properties:
         boardId:
           type: integer
-        groupId:
-          type: integer
-        writerId:
-          type: integer
+          format: int64
+          example: 1
         title:
           type: string
-        createdAt:
+          example: "DP 세션"
+        endTime:
           type: string
           format: date-time
+          example: "2025-01-01T10:00:00"
+        problemsCount:
+          type: integer
+          example: 5
+
+
 
     BoardDetailResponse:
       type: object
