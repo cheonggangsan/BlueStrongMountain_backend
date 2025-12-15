@@ -11,10 +11,12 @@ public class BoardResponse {
     private Long boardId;
     private String title;
     private LocalDateTime endTime;
+    private int problemsCount;
 
-    public BoardResponse(Long boardId, String title, LocalDateTime endTime) {
+    public BoardResponse(Long boardId, String title, LocalDateTime endTime, int problemsCount) {
         this.boardId = boardId;
         this.title = title;
         this.endTime = endTime;
+        this.problemsCount = problemsCount;
     }
 }
