@@ -54,7 +54,7 @@ public class BoardServiceImpl implements BoardService{
 
         // (검색 조건은 이후 QueryDSL 또는 필터 로직 추가)
         return boards.stream()
-                .map(b -> new BoardResponse(b.getId(), b.getTitle(), b.getEndTime()))
+                .map(b -> new BoardResponse(b.getId(), b.getTitle(), b.getEndTime(), boardProblemRepository.findByBoardId(b.getId()).size()))
                 .collect(Collectors.toList());
     }
     @Override
