@@ -39,9 +39,8 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             BoardCreateRequest req) {
 
         //groupId 검증
-        if(!groupRepository.findById(groupId).isPresent()){
-            throw new GroupNotFoundException(groupId);
-        }
+        validateGroupExists(groupId);
+
 
         if(req.getEndTime() != null && LocalDateTime.now().isAfter(req.getEndTime())){
             throw new RuntimeException("Deadline should not be in the past");
@@ -67,7 +66,6 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             Long requesterId,
             Long groupId,
             Long boardId) {
-        //groupId에 대한 로직이 따로 없음
 
         List<BoardUserProgress> progresses =
                 boardUserProgressService.getProgressByBoard(boardId);
@@ -118,9 +116,7 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             Long boardId,
             BoardUpdateRequest req) {
         //groupId 검증
-        if(!groupRepository.findById(groupId).isPresent()){
-            throw new GroupNotFoundException(groupId);
-        }
+        validateGroupExists(groupId);
 
         BoardDetailResponse findBoard = boardService.getBoard(groupId, boardId);
 
@@ -166,9 +162,8 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             Long groupId,
             Long boardId) {
         //groupId 검증
-        if(!groupRepository.findById(groupId).isPresent()){
-            throw new GroupNotFoundException(groupId);
-        }
+        validateGroupExists(groupId);
+
         boardUserProgressService.deleteByBoard(boardId);
 
         boardService.deleteBoard(
@@ -207,6 +202,12 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
                         problemId
                 );
             }
+        }
+    }
+
+    private void validateGroupExists(Long groupId){
+        if(!groupRepository.findById(groupId).isPresent()){
+            throw new GroupNotFoundException(groupId);
         }
     }
 }
