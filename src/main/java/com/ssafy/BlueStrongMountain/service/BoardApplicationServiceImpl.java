@@ -36,7 +36,7 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             BoardCreateRequest req) {
 
         if(LocalDateTime.now().isAfter(req.getEndTime())){
-            throw new RuntimeException("update Deadline should not before than startTime");
+            throw new RuntimeException("Deadline should not be in the past");
         }
 
         Long boardId
