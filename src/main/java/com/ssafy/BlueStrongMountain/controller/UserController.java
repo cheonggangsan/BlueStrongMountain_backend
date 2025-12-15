@@ -1,13 +1,12 @@
 package com.ssafy.BlueStrongMountain.controller;
 
-import com.ssafy.BlueStrongMountain.dto.BaseResponse;
-import com.ssafy.BlueStrongMountain.dto.ChangePasswordRequest;
-import com.ssafy.BlueStrongMountain.dto.ChangeUsernameRequest;
-import com.ssafy.BlueStrongMountain.dto.UserInfoResponse;
+import com.ssafy.BlueStrongMountain.dto.*;
 import com.ssafy.BlueStrongMountain.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -18,6 +17,13 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserInfoResponse> get(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUser(id));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<UserSimpleDto>> getUsersByKeyword(
+            @RequestParam String query
+    ){
+        return ResponseEntity.ok(userService.searchUsersByKeyword(query));
     }
 
     @PatchMapping("/{id}/username")
