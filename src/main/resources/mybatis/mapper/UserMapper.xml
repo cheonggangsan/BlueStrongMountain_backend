@@ -51,7 +51,7 @@
     </select>
 
     <select id="searchByUsername" resultMap="UserResultMap">
-        SELECT * FROM users WHERE email LIKE CONCAT('%', #{keyword}, '%')
+        SELECT * FROM users WHERE username LIKE CONCAT('%', #{keyword}, '%')
     </select>
 
     <select id="findByUsername" resultMap="UserResultMap">
