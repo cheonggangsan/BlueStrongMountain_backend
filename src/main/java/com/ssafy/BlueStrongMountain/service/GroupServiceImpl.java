@@ -6,19 +6,23 @@ import com.ssafy.BlueStrongMountain.dto.GroupDetailDto;
 import com.ssafy.BlueStrongMountain.dto.GroupSummaryDto;
 import com.ssafy.BlueStrongMountain.dto.GroupUpdateRequest;
 import com.ssafy.BlueStrongMountain.exception.GroupNotFoundException;
+import com.ssafy.BlueStrongMountain.repository.BoardRepository;
+import com.ssafy.BlueStrongMountain.repository.BoardUserProgressRepository;
 import com.ssafy.BlueStrongMountain.repository.GroupRepository;
 import com.ssafy.BlueStrongMountain.repository.UserGroupRepository;
 
 import com.ssafy.BlueStrongMountain.service.validator.GroupAuthorityService;
 import com.ssafy.BlueStrongMountain.service.validator.GroupValidator;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
@@ -26,18 +30,9 @@ public class GroupServiceImpl implements GroupService {
     private final GroupValidator groupValidator;
     private final GroupAuthorityService groupAuthorityService;
 
+    private final BoardUserProgressRepository boardUserProgressRepository;
+    private final BoardRepository boardRepository;
 
-    public GroupServiceImpl(
-            final GroupRepository groupRepository,
-            final UserGroupRepository userGroupRepository,
-            final GroupValidator groupValidator,
-            final GroupAuthorityService groupAuthorityService
-    ) {
-        this.groupRepository = groupRepository;
-        this.userGroupRepository = userGroupRepository;
-        this.groupValidator = groupValidator;
-        this.groupAuthorityService = groupAuthorityService;
-    }
 
     @Override
     public Long createGroup(
@@ -172,13 +167,100 @@ public class GroupServiceImpl implements GroupService {
             final Long groupId,
             final GroupUpdateRequest request
     ) {
-        groupValidator.validateUpdateRequest(request);
+        groupValidator.validateUpdateRequest(requesterId, request);
         groupAuthorityService.validateOwner(requesterId, groupId);
+
 
         final Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new GroupNotFoundException(groupId));
 
         final LocalDateTime now = LocalDateTime.now();
+
+        
+        //기존 유저 조회
+        List<UserGroup> oldGroupUsers =
+                userGroupRepository.findByGroupId(groupId);
+
+        Map<Long, UserGroup> oldUserMap = oldGroupUsers.stream()
+                .collect(Collectors.toMap(UserGroup::getUserId, ug -> ug));
+
+        Set<Long> oldManagerIds = oldGroupUsers.stream()
+                .filter(ug -> ug.getRole() == GroupRole.MANAGER)
+                .map(UserGroup::getUserId)
+                .collect(Collectors.toSet());
+
+        Set<Long> oldMemberIds = oldGroupUsers.stream()
+                .filter(ug -> ug.getRole() == GroupRole.MEMBER)
+                .map(UserGroup::getUserId)
+                .collect(Collectors.toSet());
+
+
+        //요청 사용자
+        Set<Long> newManagerIds = new HashSet<>(request.getManagerIds());
+        Set<Long> newMemberIds = new HashSet<>(request.getMemberIds());
+
+        //역할 변경
+        for(Long userId : newManagerIds){
+            if(oldMemberIds.contains(userId)){
+                UserGroup ug = oldUserMap.get(userId);
+                ug.changeRole(GroupRole.MANAGER);
+                userGroupRepository.updateRole(ug);
+            }
+        }
+
+        for(Long userId : newMemberIds){
+            if(oldManagerIds.contains(userId)){
+                UserGroup ug = oldUserMap.get(userId);
+                ug.changeRole(GroupRole.MEMBER);
+                userGroupRepository.updateRole(ug);
+            }
+        }
+
+
+        //신규 추가
+        for(Long userId : newManagerIds){
+            if(!oldUserMap.containsKey(userId)){
+                userGroupRepository.insert(
+                        UserGroup.create(
+                                userId,
+                                groupId,
+                                GroupRole.MANAGER,
+                                now
+                        )
+                );
+            }
+        }
+
+        for(Long userId : newMemberIds){
+            if(!oldUserMap.containsKey(userId)){
+                userGroupRepository.insert(
+                        UserGroup.create(
+                                userId,
+                                groupId,
+                                GroupRole.MEMBER,
+                                now
+                        )
+                );
+            }
+        }
+
+        //기존 삭제
+        Set<Long> newAll = new HashSet<>();
+        newAll.addAll(newManagerIds);
+        newAll.addAll(newMemberIds);
+
+        List<Long> toDeleteIds = oldUserMap.keySet().stream()
+                .filter(userId -> (!newAll.contains(userId)))
+                .filter(userId -> !userId.equals(requesterId))
+                .toList();
+        if(!toDeleteIds.isEmpty()){
+            userGroupRepository.deleteByGroupIdAndUserIdIn(groupId, toDeleteIds);
+        }
+
+        //BoardUserProgress 삭제
+        cleanupBoardUserProgress(groupId, toDeleteIds);
+
+        //그룹 자체 업데이트
         group.update(
                 request.getTitle(),
                 request.getDescription(),
@@ -192,6 +274,41 @@ public class GroupServiceImpl implements GroupService {
 
         groupRepository.save(group);
     }
+
+    private void cleanupBoardUserProgress(
+            Long groupId,
+            List<Long> removedUserIds
+    ){
+        List<Long> boardIds = boardRepository.findByGroupId(groupId)
+                .stream()
+                .map(Board::getId)
+                .toList();
+
+        for(Long boardId : boardIds){
+            for(Long userId : removedUserIds){
+                cleanupUserProgressInBoard(boardId, userId);
+            }
+        }
+
+    }
+    private void cleanupUserProgressInBoard(
+            Long boardId,
+            Long userId
+    ){
+        List<Long> problemIds =
+                boardUserProgressRepository.findProblemIdsByBoardAndUser(
+                        boardId,
+                        userId
+                );
+        if(problemIds.isEmpty()){
+            return;
+        }
+        boardUserProgressRepository.deleteByBoardAndUser(
+                boardId,
+                userId
+        );
+    }
+
 
     @Override
     public void changeOwner(
