@@ -5,9 +5,11 @@ import com.ssafy.BlueStrongMountain.domain.BoardUserProgress;
 import com.ssafy.BlueStrongMountain.domain.BoardUserStatus;
 import com.ssafy.BlueStrongMountain.dto.*;
 import com.ssafy.BlueStrongMountain.exception.GroupNotFoundException;
+import com.ssafy.BlueStrongMountain.exception.UserNotFoundException;
 import com.ssafy.BlueStrongMountain.repository.BoardProblemRepository;
 import com.ssafy.BlueStrongMountain.repository.BoardUserProgressRepository;
 import com.ssafy.BlueStrongMountain.repository.GroupRepository;
+import com.ssafy.BlueStrongMountain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
 
     private final BoardProblemRepository boardProblemRepository;
     private final GroupRepository groupRepository;
+    private final UserRepository userRepository;
 
 
     private final BoardUserProgressRepository boardUserProgressRepository;
@@ -87,6 +90,15 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
                     .add(problemId);
         }
 
+        //username 캐싱
+        Map<Long, String> usernameMap = new HashMap<>();
+        for(Long userId : userSolvedMap.keySet()){
+            String username = userRepository.findById(userId)
+                    .orElseThrow(UserNotFoundException::new)
+                    .getUsername();
+            usernameMap.put(userId, username);
+        }
+
         List<BoardProblemStatusDto> problemStatus =
                 problemSolvedMap.entrySet()
                     .stream()
@@ -95,8 +107,11 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
         List<BoardUserStatusDto> userStatus =
                 userSolvedMap.entrySet()
                         .stream()
-                        .map(e -> new BoardUserStatusDto(e.getKey(), e.getValue()))
+                        .map(e -> new BoardUserStatusDto(e.getKey(),
+                                usernameMap.get(e.getKey()),
+                                e.getValue()))
                         .toList();
+
 
         return new BoardProgressResponse(
                 boardId,

@@ -11,5 +11,6 @@ import java.util.List;
 @ToString
 public class BoardUserStatusDto {
     private final Long userId;
+    private final String username;
     private List<Long> solvedProblemIds;
 }
