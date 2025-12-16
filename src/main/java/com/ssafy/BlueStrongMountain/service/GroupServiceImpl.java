@@ -196,8 +196,15 @@ public class GroupServiceImpl implements GroupService {
 
 
         //요청 사용자
-        Set<Long> newManagerIds = new HashSet<>(request.getManagerIds());
-        Set<Long> newMemberIds = new HashSet<>(request.getMemberIds());
+        Set<Long> newManagerIds =
+                request.getManagerIds() == null
+                        ? Set.of()
+                        : new HashSet<>(request.getManagerIds());
+
+        Set<Long> newMemberIds =
+                request.getMemberIds() == null
+                        ? Set.of()
+                        : new HashSet<>(request.getMemberIds());
 
         //역할 변경
         for(Long userId : newManagerIds){
