@@ -30,7 +30,7 @@ public class GroupValidator {
             throw new InvalidGroupUpdateException("Request must not be null.");
         }
         if (request.getTitle() == null || request.getTitle().isBlank()) {
-            throw new InvalidGroupCreateException("Group title must not be empty.");
+            throw new InvalidGroupUpdateException("Group title must not be empty.");
         }
 
         validateDuplicateIds(ownerId, request.getManagerIds(), request.getMemberIds());
