@@ -623,49 +623,14 @@ paths:
                 content: "플로이드-워셜과 최소 컷"
                 startTime: "2025-01-01T10:00:00"
                 endTime: "2025-01-01T12:00:00"
-                problems: [1409, 1508]
+                problems:
+                  - id: 1409
+                    title: "행렬"
+                    difficulty: 12
+                  - id: 1508
+                    title: "레이스"
+                    difficulty: 13
 
-
-
-
-    # patch:
-    #   tags:
-    #    - Board
-    #   summary: Update board
-    #   parameters:
-    #     - in: path
-    #       name: groupId
-    #       required: true
-    #       schema:
-    #         type: integer
-    #     - in: path
-    #       name: boardId
-    #       required: true
-    #       schema:
-    #         type: integer
-    #     - in: query
-    #       name: requesterId
-    #       required: true
-    #       schema:
-    #         type: integer
-    #   requestBody:
-    #     required: true
-    #     content:
-    #       application/json:
-    #         schema:
-    #           $ref: '#/components/schemas/BoardUpdateRequest'
-    #         example:
-    #           title: "그래프 심화 세션(수정)"
-    #           content: "최소 컷 문제 보완 정리"
-    #           startTime: "2025-01-01T11:00:00"
-    #   responses:
-    #     '200':
-    #       description: Updated successfully
-    #       content:
-    #         application/json:
-    #           schema:
-    #             type: string
-    #           example: "updated"
     patch:
       tags:
         - Board
@@ -1291,7 +1256,9 @@ components:
         newOwnerId:
           type: integer
 
-
+      ############################################################
+    # Board DTOs
+    ############################################################
     BoardCreateRequest:
       type: object
       properties:
@@ -1348,6 +1315,19 @@ components:
           example: 5
 
 
+    ProblemSimpleDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1409
+        title:
+          type: string
+          example: "행렬"
+        difficulty:
+          type: integer
+          example: 12
+
 
     BoardDetailResponse:
       type: object
@@ -1371,7 +1351,7 @@ components:
         problems:
           type: array
           items:
-            type: integer
+            $ref: '#/components/schemas/ProblemSimpleDto'
 
     BoardProgressResponse:
       type: object
@@ -1413,7 +1393,9 @@ components:
             type: integer
             format: int64
 
-
+      ############################################################
+    # ProblemFilter DTOs
+    ############################################################
 
     ProblemFilterRequest:
       type: object
