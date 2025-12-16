@@ -1,28 +1,31 @@
 package com.ssafy.BlueStrongMountain.service;
 
+import com.ssafy.BlueStrongMountain.domain.Board;
 import com.ssafy.BlueStrongMountain.domain.GroupRole;
 import com.ssafy.BlueStrongMountain.domain.UserGroup;
 import com.ssafy.BlueStrongMountain.exception.CannotRemoveOwnerException;
 import com.ssafy.BlueStrongMountain.exception.UserNotInGroupException;
+import com.ssafy.BlueStrongMountain.repository.BoardRepository;
+import com.ssafy.BlueStrongMountain.repository.BoardUserProgressRepository;
 import com.ssafy.BlueStrongMountain.repository.UserGroupRepository;
 import com.ssafy.BlueStrongMountain.service.validator.GroupAuthorityService;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class GroupMemberServiceImpl implements GroupMemberService {
 
     private final UserGroupRepository userGroupRepository;
     private final GroupAuthorityService groupAuthorityService;
 
-    public GroupMemberServiceImpl(
-            final UserGroupRepository userGroupRepository,
-            final GroupAuthorityService groupAuthorityService
-    ) {
-        this.userGroupRepository = userGroupRepository;
-        this.groupAuthorityService = groupAuthorityService;
-    }
+    private final BoardRepository boardRepository;
+    private final BoardUserProgressRepository boardUserProgressRepository;
+
 
     @Override
     public void addManagers(
@@ -134,6 +137,45 @@ public class GroupMemberServiceImpl implements GroupMemberService {
             throw new CannotRemoveOwnerException(requesterId, groupId);
         }
 
+        //본인의 board 문제 풀이 기록 삭제
+        List<Long> toDeleteIds = new ArrayList<>();
+        toDeleteIds.add(requesterId);
+        cleanupBoardUserProgress(groupId, toDeleteIds);
+
         userGroupRepository.deleteByUserIdAndGroupId(requesterId, groupId);
+    }
+
+    private void cleanupBoardUserProgress(
+            Long groupId,
+            List<Long> removedUserIds
+    ){
+        List<Long> boardIds = boardRepository.findByGroupId(groupId)
+                .stream()
+                .map(Board::getId)
+                .toList();
+
+        for(Long boardId : boardIds){
+            for(Long userId : removedUserIds){
+                cleanupUserProgressInBoard(boardId, userId);
+            }
+        }
+
+    }
+    private void cleanupUserProgressInBoard(
+            Long boardId,
+            Long userId
+    ){
+        List<Long> problemIds =
+                boardUserProgressRepository.findProblemIdsByBoardAndUser(
+                        boardId,
+                        userId
+                );
+        if(problemIds.isEmpty()){
+            return;
+        }
+        boardUserProgressRepository.deleteByBoardAndUser(
+                boardId,
+                userId
+        );
     }
 }

@@ -260,8 +260,6 @@ paths:
                 items:
                   $ref: '#/components/schemas/GroupSummaryResponse'
 
-
-
   /api/v1/groups/{groupId}:
     patch:
       tags: [Group]
@@ -1186,6 +1184,14 @@ components:
       properties:
         title:
           type: string
+        managerIds:
+          type: array
+          items:
+            type: integer
+        memberIds:
+          type: array
+          items:
+            type: integer
         visibility:
           type: string
         description:

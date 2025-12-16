@@ -2,8 +2,7 @@ package com.ssafy.BlueStrongMountain.service.validator;
 
 import com.ssafy.BlueStrongMountain.dto.GroupCreateRequest;
 import com.ssafy.BlueStrongMountain.dto.GroupUpdateRequest;
-import com.ssafy.BlueStrongMountain.exception.InvalidGroupCreateException;
-import com.ssafy.BlueStrongMountain.exception.InvalidGroupUpdateException;
+import com.ssafy.BlueStrongMountain.exception.InvalidGroupException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -15,20 +14,25 @@ public class GroupValidator {
 
     public void validateCreateRequest(final Long ownerId, final GroupCreateRequest request) {
         if (request == null) {
-            throw new InvalidGroupCreateException("Request must not be null.");
+            throw new InvalidGroupException("Request must not be null.");
         }
 
         if (request.getTitle() == null || request.getTitle().isBlank()) {
-            throw new InvalidGroupCreateException("Group title must not be empty.");
+            throw new InvalidGroupException("Group title must not be empty.");
         }
 
         validateDuplicateIds(ownerId, request.getManagerIds(), request.getMemberIds());
     }
 
-    public void validateUpdateRequest(final GroupUpdateRequest request) {
+    public void validateUpdateRequest(final Long ownerId, final GroupUpdateRequest request) {
         if (request == null) {
-            throw new InvalidGroupUpdateException("Request must not be null.");
+            throw new InvalidGroupException("Request must not be null.");
         }
+        if (request.getTitle() == null || request.getTitle().isBlank()) {
+            throw new InvalidGroupException("Group title must not be empty.");
+        }
+
+        validateDuplicateIds(ownerId, request.getManagerIds(), request.getMemberIds());
     }
 
 //    public void validateDuplicateMemberIds(final List<Long> memberIds) {
@@ -50,7 +54,7 @@ public class GroupValidator {
         if (managerIds != null) {
             for (Long id : managerIds) {
                 if (set.contains(id)) {
-                    throw new InvalidGroupCreateException("Duplicate id in managerIds and memberIds. id=" + id);
+                    throw new InvalidGroupException("Duplicate id in managerIds and memberIds. id=" + id);
                 }
                 set.add(id);
             }
@@ -58,7 +62,7 @@ public class GroupValidator {
         if (memberIds != null) {
             for (Long id : memberIds) {
                 if (set.contains(id)) {
-                    throw new InvalidGroupCreateException("Duplicate id in managerIds and memberIds. id=" + id);
+                    throw new InvalidGroupException("Duplicate id in managerIds and memberIds. id=" + id);
                 }
                 set.add(id);
             }
