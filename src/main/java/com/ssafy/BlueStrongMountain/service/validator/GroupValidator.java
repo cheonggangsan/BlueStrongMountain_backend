@@ -25,10 +25,15 @@ public class GroupValidator {
         validateDuplicateIds(ownerId, request.getManagerIds(), request.getMemberIds());
     }
 
-    public void validateUpdateRequest(final GroupUpdateRequest request) {
+    public void validateUpdateRequest(final Long ownerId, final GroupUpdateRequest request) {
         if (request == null) {
             throw new InvalidGroupUpdateException("Request must not be null.");
         }
+        if (request.getTitle() == null || request.getTitle().isBlank()) {
+            throw new InvalidGroupCreateException("Group title must not be empty.");
+        }
+
+        validateDuplicateIds(ownerId, request.getManagerIds(), request.getMemberIds());
     }
 
 //    public void validateDuplicateMemberIds(final List<Long> memberIds) {
