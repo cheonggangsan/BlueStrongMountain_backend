@@ -7,6 +7,7 @@ import com.ssafy.BlueStrongMountain.exception.BoardNotFoundException;
 import com.ssafy.BlueStrongMountain.repository.BoardProblemRepository;
 import com.ssafy.BlueStrongMountain.repository.BoardRepository;
 import com.ssafy.BlueStrongMountain.repository.BoardUserProgressRepository;
+import com.ssafy.BlueStrongMountain.repository.ProblemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class BoardServiceImpl implements BoardService{
     private final BoardRepository boardRepository;
     private final BoardProblemRepository boardProblemRepository;
+    private final ProblemRepository problemRepository;
 
 
     @Override
@@ -67,13 +69,21 @@ public class BoardServiceImpl implements BoardService{
                 .stream()
                 .map(BoardProblem::getProblemId)
                 .toList();
+        List<ProblemSimpleDto>problems = problemRepository.findByIdList(problemIds)
+                .stream()
+                .map(e -> new ProblemSimpleDto(
+                        e.getId(),
+                        e.getTitle(),
+                        e.getDifficulty()
+                )).toList();
+
         // (검색 조건은 이후 QueryDSL 또는 필터 로직 추가)
         return new BoardDetailResponse(
                 board.getId(),
                 board.getTitle(),
                 board.getStartTime(),
                 board.getEndTime(),
-                problemIds
+                problems
         );
     }
 
