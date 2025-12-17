@@ -2,16 +2,22 @@ package com.ssafy.BlueStrongMountain.service;
 
 import com.ssafy.BlueStrongMountain.domain.Board;
 import com.ssafy.BlueStrongMountain.domain.GroupRole;
+import com.ssafy.BlueStrongMountain.domain.User;
 import com.ssafy.BlueStrongMountain.domain.UserGroup;
+import com.ssafy.BlueStrongMountain.dto.GroupUserDto;
 import com.ssafy.BlueStrongMountain.exception.CannotRemoveOwnerException;
+import com.ssafy.BlueStrongMountain.exception.UserNotFoundException;
 import com.ssafy.BlueStrongMountain.exception.UserNotInGroupException;
 import com.ssafy.BlueStrongMountain.repository.BoardRepository;
 import com.ssafy.BlueStrongMountain.repository.BoardUserProgressRepository;
 import com.ssafy.BlueStrongMountain.repository.UserGroupRepository;
+import com.ssafy.BlueStrongMountain.repository.UserRepository;
 import com.ssafy.BlueStrongMountain.service.validator.GroupAuthorityService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +32,37 @@ public class GroupMemberServiceImpl implements GroupMemberService {
     private final BoardRepository boardRepository;
     private final BoardUserProgressRepository boardUserProgressRepository;
 
+    private final UserRepository userRepository;
+
+
+    @Override
+    public List<GroupUserDto> getAllUsers(Long requesterId, Long groupId) {
+        System.out.println("group users service starts!!!");
+        //TODO 검증 로직 추후 추가
+        userGroupRepository.findByUserIdAndGroupId(requesterId, groupId)
+                .orElseThrow(() -> new UserNotInGroupException(requesterId, groupId));
+
+        List<UserGroup> userGroups =
+                userGroupRepository.findByGroupId(groupId);
+
+        Map<Long, User> userMap = new HashMap<>();
+
+        //userid로 user 정보와 map에 저장
+        for(UserGroup ug : userGroups){
+            userMap.put(ug.getUserId(),
+                    userRepository.findById(ug.getUserId())
+                            .orElseThrow(UserNotFoundException::new));
+        }
+
+        return userGroups.stream()
+                        .map(ug -> new GroupUserDto(
+                                ug.getUserId(),
+                                userMap.get(ug.getUserId())
+                                                .getUsername(),
+                                ug.getRole()
+                        ))
+                        .toList();
+    }
 
     @Override
     public void addManagers(
