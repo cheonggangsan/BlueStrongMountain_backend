@@ -322,6 +322,39 @@ paths:
         '403':
           description: "그룹 접근 권한 없음"
 
+  /api/v1/groups/{groupId}/users:
+    get:
+      tags:
+        - Group
+      summary: Get all users in a group
+      description: 그룹에 속한 모든 유저 목록을 조회한다.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: 그룹 ID
+        - in: query
+          name: requesterId
+          required: true
+          schema:
+            type: integer
+          description: 요청자 사용자 ID
+      responses:
+        '200':
+          description: Group users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupUserDto'
+        '403':
+          description: Permission denied
+        '404':
+          description: User or group not found
+
 
   /api/v1/groups/{groupId}/owner:
     patch:
@@ -1261,6 +1294,22 @@ components:
       properties:
         newOwnerId:
           type: integer
+    GroupUserDto:
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: fermat001
+        role:
+          type: string
+          enum:
+            - OWNER
+            - MANAGER
+            - MEMBER
+          example: MEMBER
 
       ############################################################
     # Board DTOs
