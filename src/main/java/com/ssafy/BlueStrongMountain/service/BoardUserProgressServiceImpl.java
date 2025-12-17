@@ -18,7 +18,6 @@ public class BoardUserProgressServiceImpl implements BoardUserProgressService {
 
     private final BoardUserProgressRepository progressRepository;
     private final UserGroupRepository userGroupRepository;
-    private final UserSolutionRepository userSolutionRepository;
 
     /* ===============================
      * 초기화
@@ -53,10 +52,10 @@ public class BoardUserProgressServiceImpl implements BoardUserProgressService {
                 BoardUserProgress progress =
                         new BoardUserProgress(boardId, userId, problemId);
 
-                // user_solution에 있으면 solved 처리
-                userSolutionRepository
-                        .findByUserAndProblem(userId, problemId)
-                        .ifPresent(solution -> progress.markSolved());
+//                // user_solution에 있으면 solved 처리
+//                userSolutionRepository
+//                        .findByUserAndProblem(userId, problemId)
+//                        .ifPresent(solution -> progress.markSolved());
 
                 progressRepository.save(progress);
             }
