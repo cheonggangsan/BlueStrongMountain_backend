@@ -90,7 +90,7 @@
         status = #{status},
         solved_at =
         <choose>
-            <when test="status == 'SOLVED'">
+            <when test="status == @com.ssafy.BlueStrongMountain.domain.BoardUserStatus@SOLVED">
                 #{solvedAt}
             </when>
             <otherwise>

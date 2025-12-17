@@ -1,15 +1,10 @@
 package com.ssafy.BlueStrongMountain.service;
 
-import com.ssafy.BlueStrongMountain.domain.BoardProblem;
-import com.ssafy.BlueStrongMountain.domain.BoardUserProgress;
-import com.ssafy.BlueStrongMountain.domain.BoardUserStatus;
+import com.ssafy.BlueStrongMountain.domain.*;
 import com.ssafy.BlueStrongMountain.dto.*;
 import com.ssafy.BlueStrongMountain.exception.GroupNotFoundException;
 import com.ssafy.BlueStrongMountain.exception.UserNotFoundException;
-import com.ssafy.BlueStrongMountain.repository.BoardProblemRepository;
-import com.ssafy.BlueStrongMountain.repository.BoardUserProgressRepository;
-import com.ssafy.BlueStrongMountain.repository.GroupRepository;
-import com.ssafy.BlueStrongMountain.repository.UserRepository;
+import com.ssafy.BlueStrongMountain.repository.*;
 import com.ssafy.BlueStrongMountain.service.validator.GroupAuthorityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +24,10 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
 
     private final BoardProblemRepository boardProblemRepository;
     private final GroupRepository groupRepository;
+    private final UserGroupRepository userGroupRepository;
+
     private final UserRepository userRepository;
+    private final UserSolutionRepository userSolutionRepository;
 
     private final GroupAuthorityService groupAuthorityService;
 
@@ -65,6 +64,10 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
                 req.getProblemIds()
         );
 
+        //userSolution sync
+        syncBoardUserProgress(requesterId, groupId, boardId);
+        //userSolution sync end
+
         return boardId;
     }
 
@@ -76,6 +79,11 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
 
         List<BoardUserProgress> progresses =
                 boardUserProgressService.getProgressByBoard(boardId);
+
+        //TODO 임시 동기화 기능으로 생각해야 함
+        //userSolution sync
+        syncBoardUserProgress(requesterId, groupId, boardId);
+        //userSolution sync end
 
         Map<Long, List<Long>> problemSolvedMap = new HashMap<>();
         Map<Long, List<Long>> userSolvedMap = new HashMap<>();
@@ -174,6 +182,9 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
                 addedProblemIds.stream().toList(),
                 removedProblemIds.stream().toList()
         );
+        //userSolution sync
+        syncBoardUserProgress(requesterId, groupId, boardId);
+        //userSolution sync end
     }
 
     @Override
@@ -196,7 +207,7 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
 
 
     @Override
-    public void syncUserProgress(
+    public void syncBoardUserProgress(
             Long requesterId,
             Long groupId,
             Long boardId
@@ -207,23 +218,48 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             return;
         }
 
-        solvedAcSyncService.syncUserSolution(requesterId);
+        List<Long> userIdsInGroup =
+                userGroupRepository.findByGroupId(groupId)
+                        .stream()
+                        .map(UserGroup::getUserId)
+                        .toList();
+        for(Long userId : userIdsInGroup){
+            syncSingleUserProgress(userId, boardId);
+        }
+    }
+
+    private void syncSingleUserProgress(
+            Long userId,
+            Long boardId
+    ){
+//        long startTime = System.nanoTime();
+
+//        solvedAcSyncService.syncUserSolution(requesterId);
+//        List<Long> pendingProblemIds =
+//                boardUserProgressService.getPendingProblemIds(boardId, requesterId);
 
         List<Long> pendingProblemIds =
-                boardUserProgressService.getPendingProblemIds(boardId, requesterId);
+                boardUserProgressService.getPendingProblemIds(boardId, userId);
 
         Set<Long> solvedProblemIds =
-                solvedAcSyncService.getSolvedProblemIds(requesterId);
+                userSolutionRepository.findByUserId(userId)
+                .stream()
+                .map(UserSolution::getProblemId)
+                .collect(Collectors.toSet());
 
         for(Long problemId : pendingProblemIds){
             if(solvedProblemIds.contains(problemId)){
                 boardUserProgressService.markSolved(
                         boardId,
-                        requesterId,
+                        userId,
                         problemId
                 );
             }
         }
+
+//        long endTime = System.nanoTime();
+//        long elapsedMs = (endTime - startTime) / 1_000_000;
+//        System.out.println("syncUserProgress time = " + elapsedMs + "ms");
     }
 
     private void validateGroupExists(Long groupId){

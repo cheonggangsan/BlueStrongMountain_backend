@@ -35,6 +35,11 @@ public class UserRepositoryImpl implements UserRepository{
     }
 
     @Override
+    public List<User> findAll() {
+        return mapper.findAll();
+    }
+
+    @Override
     public List<User> searchByEmail(String keyword) {
         return mapper.searchByEmail(keyword);
     }
