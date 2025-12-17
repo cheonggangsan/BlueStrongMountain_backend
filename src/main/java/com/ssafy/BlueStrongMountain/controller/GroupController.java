@@ -46,6 +46,19 @@ public class GroupController {
     }
 
     /**
+     * 그룹 유저들 조회
+     */
+    @GetMapping("/{groupId}/users")
+    public ResponseEntity<List<GroupUserDto>> getAllUsers(
+            @RequestParam Long requesterId,
+            @PathVariable Long groupId
+    ){
+        //TEST
+        System.out.println("group users controller start!!!!");
+        return ResponseEntity.ok(groupMemberService.getAllUsers(requesterId, groupId));
+    }
+
+    /**
      * 내가 속한 그룹 전체 조회
      */
     @GetMapping
