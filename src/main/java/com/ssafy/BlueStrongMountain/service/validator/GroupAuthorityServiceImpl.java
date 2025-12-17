@@ -3,6 +3,7 @@ package com.ssafy.BlueStrongMountain.service.validator;
 import com.ssafy.BlueStrongMountain.domain.GroupRole;
 import com.ssafy.BlueStrongMountain.domain.UserGroup;
 import com.ssafy.BlueStrongMountain.exception.CannotTransferOwnershipException;
+import com.ssafy.BlueStrongMountain.exception.ManagerPermissionRequiredException;
 import com.ssafy.BlueStrongMountain.exception.OwnerPermissionRequiredException;
 import com.ssafy.BlueStrongMountain.exception.UserNotInGroupException;
 import com.ssafy.BlueStrongMountain.repository.UserGroupRepository;
@@ -31,7 +32,7 @@ public class GroupAuthorityServiceImpl implements GroupAuthorityService {
         final UserGroup userGroup = getUserGroupOrThrow(userId, groupId);
 
         if (userGroup.getRole() == GroupRole.MEMBER) {
-            throw new OwnerPermissionRequiredException();
+            throw new ManagerPermissionRequiredException();
         }
     }
 
