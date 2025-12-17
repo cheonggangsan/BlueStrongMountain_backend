@@ -14,6 +14,8 @@ public interface UserMapper {
 
     User findById(@Param("id") Long id);
 
+    List<User> findAll();
+
     User findByEmail(@Param("email") String email);
 
     User findByUsername(@Param("username") String username);

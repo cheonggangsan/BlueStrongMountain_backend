@@ -37,6 +37,20 @@
         WHERE id = #{id}
     </update>
 
+    <select id="findAll" resultMap="UserResultMap">
+        SELECT
+            id,
+            email,
+            password,
+            username,
+            baekjoon,
+            status,
+            role,
+            refresh_token,
+            created_at,
+            updated_at
+        FROM users
+    </select>
 
     <select id="findById" resultMap="UserResultMap">
         SELECT * FROM users WHERE id = #{id}
