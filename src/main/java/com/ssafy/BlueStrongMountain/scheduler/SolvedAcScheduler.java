@@ -17,7 +17,7 @@ public class SolvedAcScheduler {
     private final UserRepository userRepository;
     private final SolvedAcSyncService solvedAcSyncService;
 
-    //10분에 한번씩 반복
+    //30초에 한번씩 반복
     @Scheduled(fixedDelay = 30 * 1000)
     public void syncAllUsersSolvedProblems(){
         User initUser = userRepository.findById(1L)

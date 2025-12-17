@@ -3,13 +3,11 @@ package com.ssafy.BlueStrongMountain.service;
 import com.ssafy.BlueStrongMountain.domain.BoardProblem;
 import com.ssafy.BlueStrongMountain.domain.BoardUserProgress;
 import com.ssafy.BlueStrongMountain.domain.BoardUserStatus;
+import com.ssafy.BlueStrongMountain.domain.UserSolution;
 import com.ssafy.BlueStrongMountain.dto.*;
 import com.ssafy.BlueStrongMountain.exception.GroupNotFoundException;
 import com.ssafy.BlueStrongMountain.exception.UserNotFoundException;
-import com.ssafy.BlueStrongMountain.repository.BoardProblemRepository;
-import com.ssafy.BlueStrongMountain.repository.BoardUserProgressRepository;
-import com.ssafy.BlueStrongMountain.repository.GroupRepository;
-import com.ssafy.BlueStrongMountain.repository.UserRepository;
+import com.ssafy.BlueStrongMountain.repository.*;
 import com.ssafy.BlueStrongMountain.service.validator.GroupAuthorityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +27,7 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
     private final BoardProblemRepository boardProblemRepository;
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
+    private final UserSolutionRepository userSolutionRepository;
 
     private final GroupAuthorityService groupAuthorityService;
 
@@ -76,6 +75,16 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
 
         List<BoardUserProgress> progresses =
                 boardUserProgressService.getProgressByBoard(boardId);
+
+        //userSolution sync
+        Set<Long>userIdSet = new HashSet<>();
+        for(BoardUserProgress progress : progresses){
+            userIdSet.add(progress.getUserId());
+        }
+        for(Long userId : userIdSet){
+            syncUserProgress(requesterId, groupId, boardId);
+        }
+        //userSolution sync end
 
         Map<Long, List<Long>> problemSolvedMap = new HashMap<>();
         Map<Long, List<Long>> userSolvedMap = new HashMap<>();
@@ -201,16 +210,23 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             Long groupId,
             Long boardId
     ) {
+//        long startTime = System.nanoTime();
+
         BoardDetailResponse curBoard = boardService.getBoard(groupId, boardId);
         //데드라인 지났을 경우 sync 종료
         if(curBoard.getEndTime().isBefore(LocalDateTime.now())){
             return;
         }
 
-        solvedAcSyncService.syncUserSolution(requesterId);
+//        solvedAcSyncService.syncUserSolution(requesterId);
+//        List<Long> pendingProblemIds =
+//                boardUserProgressService.getPendingProblemIds(boardId, requesterId);
 
         List<Long> pendingProblemIds =
-                boardUserProgressService.getPendingProblemIds(boardId, requesterId);
+                userSolutionRepository.findByUserId(requesterId).stream()
+                                .map(UserSolution::getProblemId)
+                                        .toList();
+
 
         Set<Long> solvedProblemIds =
                 solvedAcSyncService.getSolvedProblemIds(requesterId);
@@ -224,6 +240,10 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
                 );
             }
         }
+
+//        long endTime = System.nanoTime();
+//        long elapsedMs = (endTime - startTime) / 1_000_000;
+//        System.out.println("syncUserProgress time = " + elapsedMs + "ms");
     }
 
     private void validateGroupExists(Long groupId){
