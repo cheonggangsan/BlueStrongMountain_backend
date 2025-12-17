@@ -13,4 +13,5 @@ public interface GroupService {
     List<GroupSummaryDto> searchMyGroups(Long requesterId, String name);
     void updateGroup(Long requesterId, Long groupId, GroupUpdateRequest request);
     void changeOwner(Long requesterId, Long groupId, Long newOwnerId);
+    void deleteGroup(Long requesterId, Long groupId);
 }

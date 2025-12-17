@@ -18,8 +18,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -125,13 +125,6 @@ public class GroupServiceImpl implements GroupService {
             result.add(GroupSummaryDto.from(group, memberCount));
         }
 
-//        //test
-//        System.out.println("group size in findMyGroups = " + groups.size());
-//        for(Group group : groups){
-//            final int memberCount = userGroupRepository.countByGroupId(group.getId());
-//            System.out.println("group id : " +group.getId() + " memberCount = " + memberCount);
-//        }
-//        //test
 
         result.sort(Comparator.comparing(GroupSummaryDto::getUpdatedAt).reversed());
 
@@ -275,12 +268,59 @@ public class GroupServiceImpl implements GroupService {
                 now
         );
 
-//        //test
-//        System.out.println("update user!!!!! test");
-//        System.out.println(group.toString());
-
         groupRepository.save(group);
     }
+
+
+    @Override
+    public void changeOwner(
+            final Long requesterId,
+            final Long groupId,
+            final Long newOwnerId
+    ) {
+        groupAuthorityService.validateOwnerTransferable(requesterId, groupId, newOwnerId);
+
+        final Group findGroup = groupRepository.findById(groupId)
+                .orElseThrow(() -> new GroupNotFoundException(groupId));
+
+        final LocalDateTime now = LocalDateTime.now();
+        findGroup.changeOwner(newOwnerId, now);
+        groupRepository.save(findGroup);
+
+
+        final UserGroup oldOwner = userGroupRepository.findByUserIdAndGroupId(requesterId, groupId)
+                .orElseThrow(() -> new GroupNotFoundException(groupId));
+        oldOwner.changeRole(GroupRole.MEMBER);
+
+        userGroupRepository.updateRole(oldOwner);
+
+        final UserGroup newOwner = userGroupRepository.findByUserIdAndGroupId(newOwnerId, groupId)
+                .orElseThrow(() -> new GroupNotFoundException(groupId));
+        newOwner.changeRole(GroupRole.OWNER);
+
+        userGroupRepository.updateRole(newOwner);
+    }
+
+    @Override
+    @Transactional
+    public void deleteGroup(Long requesterId, Long groupId) {
+        //owner 검증
+        groupAuthorityService.validateOwner(requesterId, groupId);
+
+        List<Long> deleteUserIds =
+                userGroupRepository.findByGroupId(groupId).stream()
+                        .map(UserGroup::getUserId)
+                        .toList();
+
+        cleanupBoardUserProgress(groupId, deleteUserIds);
+
+        //TODO n+1 문제 있음
+        for(Long userId : deleteUserIds){
+            userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
+        }
+        groupRepository.deleteById(groupId);
+    }
+
 
     private void cleanupBoardUserProgress(
             Long groupId,
@@ -314,49 +354,5 @@ public class GroupServiceImpl implements GroupService {
                 boardId,
                 userId
         );
-    }
-
-
-    @Override
-    public void changeOwner(
-            final Long requesterId,
-            final Long groupId,
-            final Long newOwnerId
-    ) {
-        groupAuthorityService.validateOwnerTransferable(requesterId, groupId, newOwnerId);
-
-        final Group findGroup = groupRepository.findById(groupId)
-                .orElseThrow(() -> new GroupNotFoundException(groupId));
-
-        final LocalDateTime now = LocalDateTime.now();
-        findGroup.changeOwner(newOwnerId, now);
-        groupRepository.save(findGroup);
-
-//        //test
-//        System.out.println("group update test!!!!!!!!!!!!!!!!");
-//        System.out.println(findGroup.toString());
-//        System.out.println("group update test_end!!!!!!!!!!!!!!!!");
-//        //test
-
-//        //test
-//        System.out.println("before group size" + userGroupRepository.findByUserId(requesterId).size());
-//        groupRepository.save(group);
-//        System.out.println("after group size" + userGroupRepository.findByUserId(requesterId).size());
-//        //test
-
-        final UserGroup oldOwner = userGroupRepository.findByUserIdAndGroupId(requesterId, groupId)
-                .orElseThrow(() -> new GroupNotFoundException(groupId));
-        oldOwner.changeRole(GroupRole.MEMBER);
-
-        userGroupRepository.updateRole(oldOwner);
-
-        final UserGroup newOwner = userGroupRepository.findByUserIdAndGroupId(newOwnerId, groupId)
-                .orElseThrow(() -> new GroupNotFoundException(groupId));
-        newOwner.changeRole(GroupRole.OWNER);
-
-        userGroupRepository.updateRole(newOwner);
-//
-//        userGroupRepository.save(oldOwner);
-//        userGroupRepository.save(newOwner);
     }
 }

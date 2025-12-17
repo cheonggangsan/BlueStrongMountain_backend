@@ -288,6 +288,57 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BasicResponse'
+    delete:
+      tags:
+        - Group
+      summary: Delete group
+      description: |
+        그룹을 삭제합니다.
+        - 요청자는 해당 그룹의 OWNER여야 합니다.
+        - 그룹에 속한 모든 유저 및 관련 진행 정보가 함께 삭제됩니다.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: 삭제할 그룹 ID
+        - in: query
+          name: requesterId
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: 그룹 삭제를 요청한 사용자 ID (OWNER)
+      responses:
+        '200':
+          description: Group deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                success: true
+                message: "OK"
+        '403':
+          description: Forbidden - requester is not group owner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                success: false
+                message: "Not authorized to delete this group"
+        '404':
+          description: Group not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+              example:
+                success: false
+                message: "Group not found"
 
   /api/v1/groups/{groupId}/detail:
     get:

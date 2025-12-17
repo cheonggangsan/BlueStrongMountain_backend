@@ -64,22 +64,9 @@ public class GroupController {
             @RequestParam Long requesterId,
             @RequestParam(required = false) String name
     ) {
-        //test
-        //List<GroupSummaryDto> tmpDtoList;
-
-
-
         if (name != null && !name.isBlank()) {
-
-            //tmpDtoList = groupService.searchMyGroups(requesterId, name);
-
             return ResponseEntity.ok(groupService.searchMyGroups(requesterId, name));
         }
-
-        //tmpDtoList = groupService.findMyGroups(requesterId);
-//        for(GroupSummaryDto gsd : tmpDtoList){
-//            //System.out.println(gsd.toString());//test
-//        }
 
         return ResponseEntity.ok(groupService.findMyGroups(requesterId));
     }
@@ -96,6 +83,18 @@ public class GroupController {
         groupService.updateGroup(requesterId, groupId, request);
         return ResponseEntity.ok(BaseResponse.ok());
     }
+    /**
+     * 그룹 삭제
+     */
+    @DeleteMapping("/{groupId}")
+    public ResponseEntity<BaseResponse> deleteGroup(
+            @RequestParam Long requesterId,
+            @PathVariable Long groupId
+    ){
+        groupService.deleteGroup(requesterId, groupId);
+        return ResponseEntity.ok(BaseResponse.ok());
+    }
+
 
     /**
      * 그룹 소유권 이전
