@@ -1,11 +1,8 @@
 package com.ssafy.BlueStrongMountain.service;
 
-import com.ssafy.BlueStrongMountain.domain.BoardUserProgress;
 import com.ssafy.BlueStrongMountain.dto.BoardCreateRequest;
 import com.ssafy.BlueStrongMountain.dto.BoardProgressResponse;
 import com.ssafy.BlueStrongMountain.dto.BoardUpdateRequest;
-
-import java.util.List;
 
 public interface BoardApplicationService {
 
@@ -49,7 +46,7 @@ public interface BoardApplicationService {
     /* ===============================
      * Board 진행 동기화
      * =============================== */
-    void syncUserProgress(
+    void syncBoardUserProgress(
             Long requesterId,
             Long groupId,
             Long boardId
