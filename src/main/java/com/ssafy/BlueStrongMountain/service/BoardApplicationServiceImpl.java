@@ -10,6 +10,7 @@ import com.ssafy.BlueStrongMountain.repository.BoardProblemRepository;
 import com.ssafy.BlueStrongMountain.repository.BoardUserProgressRepository;
 import com.ssafy.BlueStrongMountain.repository.GroupRepository;
 import com.ssafy.BlueStrongMountain.repository.UserRepository;
+import com.ssafy.BlueStrongMountain.service.validator.GroupAuthorityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,8 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
 
+    private final GroupAuthorityService groupAuthorityService;
+
 
     private final BoardUserProgressRepository boardUserProgressRepository;
 
@@ -43,6 +46,7 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
 
         //groupId 검증
         validateGroupExists(groupId);
+        groupAuthorityService.validateManager(requesterId, groupId);
 
 
         if(req.getEndTime() != null && LocalDateTime.now().isAfter(req.getEndTime())){
@@ -132,6 +136,7 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             BoardUpdateRequest req) {
         //groupId 검증
         validateGroupExists(groupId);
+        groupAuthorityService.validateManager(requesterId, groupId);
 
         BoardDetailResponse findBoard = boardService.getBoard(groupId, boardId);
 
@@ -178,6 +183,7 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
             Long boardId) {
         //groupId 검증
         validateGroupExists(groupId);
+        groupAuthorityService.validateManager(requesterId, groupId);
 
         boardUserProgressService.deleteByBoard(boardId);
 
