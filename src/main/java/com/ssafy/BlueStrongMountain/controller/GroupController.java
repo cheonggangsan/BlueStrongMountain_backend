@@ -53,8 +53,6 @@ public class GroupController {
             @RequestParam Long requesterId,
             @PathVariable Long groupId
     ){
-        //TEST
-        System.out.println("group users controller start!!!!");
         return ResponseEntity.ok(groupMemberService.getAllUsers(requesterId, groupId));
     }
 

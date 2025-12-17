@@ -37,7 +37,6 @@ public class GroupMemberServiceImpl implements GroupMemberService {
 
     @Override
     public List<GroupUserDto> getAllUsers(Long requesterId, Long groupId) {
-        System.out.println("group users service starts!!!");
         //TODO 검증 로직 추후 추가
         userGroupRepository.findByUserIdAndGroupId(requesterId, groupId)
                 .orElseThrow(() -> new UserNotInGroupException(requesterId, groupId));
