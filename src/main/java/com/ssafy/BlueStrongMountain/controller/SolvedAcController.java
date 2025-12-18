@@ -33,17 +33,6 @@ public class SolvedAcController {
     }
 
     /**
-     * solved.ac baekjoon handle 확인 테스트
-     *
-     *
-     */
-    @GetMapping("/existHandle")
-    public ResponseEntity<Boolean> checkBaekHandle(
-            @RequestParam String handle
-    ){
-        return ResponseEntity.ok(solvedAcSyncService.existSolvedAcUser(handle));
-    }
-    /**
      * solved.ac 인증 여부 확인
      */
     @GetMapping("/verify")
