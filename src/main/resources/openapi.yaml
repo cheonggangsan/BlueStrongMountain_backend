@@ -1043,6 +1043,9 @@ paths:
                 type: boolean
               example: true
 
+  ########################################################
+  # SolvedAcController APIs
+  ########################################################
   /api/test/solvedac/sync:
     post:
       tags:
@@ -1090,10 +1093,15 @@ paths:
       responses:
         '200':
           description: 요청 처리 성공 (존재 여부와 무관)
+          content:
+            application/json:
+              schema:
+                type: boolean
         '400':
           description: 잘못된 요청 (handle 누락 또는 형식 오류)
         '500':
           description: solved.ac API 호출 중 서버 오류
+
   /api/test/solvedac/verify:
     get:
       tags:

@@ -38,14 +38,13 @@ public class SolvedAcController {
      *
      */
     @GetMapping("/existHandle")
-    public ResponseEntity<Void> checkBaekHandle(
+    public ResponseEntity<Boolean> checkBaekHandle(
             @RequestParam String handle
     ){
-        solvedAcSyncService.existSolvedAcUser(handle);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(solvedAcSyncService.existSolvedAcUser(handle));
     }
     /**
-     * solved.ac 인증 여부 확인 (쿠키 기반)
+     * solved.ac 인증 여부 확인
      */
     @GetMapping("/verify")
     public ResponseEntity<Boolean> verifySolvedAcAccount(
