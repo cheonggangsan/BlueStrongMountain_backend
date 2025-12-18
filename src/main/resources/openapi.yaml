@@ -1365,13 +1365,34 @@ components:
     GroupSummaryResponse:
       type: object
       properties:
-        id: { type: integer }
-        title: { type: string }
-        ownerId: { type: integer }
-        visibility: { type: string }
-        memberCount: { type: integer }
-        createdAt: { type: string }
-        updatedAt: { type: string }
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        ownerId:
+          type: integer
+          format: int64
+        visibility:
+          type: string
+          description: Group visibility
+          example: PUBLIC
+        memberCount:
+          type: integer
+          example: 5
+        groupRole:
+          type: string
+          description: Role of requester in the group
+          enum:
+            - OWNER
+            - MANAGER
+            - MEMBER
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     GroupDetailDto:
       type: object

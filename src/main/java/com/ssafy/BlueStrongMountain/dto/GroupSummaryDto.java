@@ -1,6 +1,7 @@
 package com.ssafy.BlueStrongMountain.dto;
 
 import com.ssafy.BlueStrongMountain.domain.Group;
+import com.ssafy.BlueStrongMountain.domain.GroupRole;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -13,6 +14,7 @@ public class GroupSummaryDto {
     private Long ownerId;
     private String visibility;
     private int memberCount;
+    private GroupRole groupRole;
     private String createdAt;
     private String updatedAt;
 
@@ -22,6 +24,7 @@ public class GroupSummaryDto {
             final Long ownerId,
             final String visibility,
             final int memberCount,
+            final GroupRole groupRole,
             final String createdAt,
             final String updatedAt
     ) {
@@ -30,12 +33,14 @@ public class GroupSummaryDto {
         this.ownerId = ownerId;
         this.visibility = visibility;
         this.memberCount = memberCount;
+        this.groupRole = groupRole;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
     public static GroupSummaryDto from(
             final Group group,
+            final GroupRole groupRole,
             final int memberCount
     ) {
         return new GroupSummaryDto(
@@ -44,6 +49,7 @@ public class GroupSummaryDto {
                 group.getOwnerId(),
                 group.getVisibility().name(),
                 memberCount,
+                groupRole,
                 group.getCreatedAt().toString(),
                 group.getUpdatedAt().toString()
         );
