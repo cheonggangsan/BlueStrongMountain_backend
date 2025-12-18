@@ -36,6 +36,31 @@ public class SolvedAcController {
     }
 
     /**
+     * solved.ac baekjoon handle 확인 테스트
+     *
+     *
+     */
+    @GetMapping("/existHandle")
+    public ResponseEntity<Void> checkBaekHandle(
+            @RequestParam String handle
+    ){
+        solvedAcSyncService.existSolvedAcUser(handle);
+        return ResponseEntity.ok().build();
+    }
+    /**
+     * solved.ac 인증 여부 확인 (쿠키 기반)
+     */
+    @GetMapping("/verify")
+    public ResponseEntity<Boolean> verifySolvedAcAccount(
+            @RequestParam String handle,
+            @RequestParam String bio
+    ) {
+        boolean verified = solvedAcSyncService.isSolvedAcVerified(handle, bio);
+        return ResponseEntity.ok(verified);
+    }
+
+
+    /**
      * 유저가 푼 문제 ID 목록 조회
      *
      * 예:
