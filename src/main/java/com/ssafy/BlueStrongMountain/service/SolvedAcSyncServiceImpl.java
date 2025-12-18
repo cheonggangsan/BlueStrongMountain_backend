@@ -97,6 +97,9 @@ public class SolvedAcSyncServiceImpl implements SolvedAcSyncService{
 
     @Override
     public boolean isSolvedAcVerified(String handle, String bio) {
+        if (handle == null || bio == null) {
+            return false;
+        }
         try {
             //BST-***** 예시 코드
             SolvedAcUserSearchResponse solvedAcUserSearchResponse =
