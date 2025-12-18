@@ -2,6 +2,7 @@ package com.ssafy.BlueStrongMountain.controller;
 
 import com.ssafy.BlueStrongMountain.dto.*;
 import com.ssafy.BlueStrongMountain.service.AuthService;
+import com.ssafy.BlueStrongMountain.service.SolvedAcSyncService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class AuthController {
     private final AuthService authService;
+    private final SolvedAcSyncService solvedAcSyncService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest req) {
@@ -34,6 +36,17 @@ public class AuthController {
             @RequestParam String username
     ) {
         return ResponseEntity.ok(authService.checkUsername(username));
+    }
+    /**
+     * solved.ac baekjoon handle 확인 테스트
+     *
+     *
+     */
+    @GetMapping("/existHandle")
+    public ResponseEntity<Boolean> checkBaekHandle(
+            @RequestParam String handle
+    ){
+        return ResponseEntity.ok(solvedAcSyncService.existSolvedAcUser(handle));
     }
 
     @PostMapping("/logout")
