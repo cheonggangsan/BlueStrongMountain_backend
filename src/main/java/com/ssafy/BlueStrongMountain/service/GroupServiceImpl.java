@@ -15,6 +15,7 @@ import com.ssafy.BlueStrongMountain.service.validator.GroupAuthorityService;
 import com.ssafy.BlueStrongMountain.service.validator.GroupValidator;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
@@ -109,7 +110,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<GroupSummaryDto> findMyGroups(final Long requesterId) {
-        final List<Long> myGroupIds = userGroupRepository.findByUserId(requesterId).stream()
+        //TODO db 접근 비효율성
+        List<UserGroup> myGroups = userGroupRepository.findByUserId(requesterId);
+        final List<Long> myGroupIds = myGroups.stream()
                 .map(UserGroup::getGroupId)
                 .toList();
 
@@ -119,10 +122,23 @@ public class GroupServiceImpl implements GroupService {
 
         final List<Group> groups = groupRepository.findByIds(myGroupIds);
 
+        Map<Long, Group> groupMap = groups.stream()
+                .collect(Collectors.toMap(Group::getId, Function.identity()));
+
+        Map<Long, GroupRole> myGroupRoleMap = myGroups.stream()
+                .collect(Collectors.toMap(UserGroup::getGroupId, UserGroup::getRole));
+
         final List<GroupSummaryDto> result = new ArrayList<>();
-        for (Group group : groups) {
-            final int memberCount = userGroupRepository.countByGroupId(group.getId());
-            result.add(GroupSummaryDto.from(group, memberCount));
+
+        for(Long groupId : myGroupIds){
+            final int memberCount = userGroupRepository.countByGroupId(groupId);
+            GroupRole myGroupRole = myGroupRoleMap.get(groupId);
+
+            result.add(GroupSummaryDto.from(
+                    groupMap.get(groupId),
+                    myGroupRole,
+                    memberCount)
+            );
         }
 
 
