@@ -69,7 +69,7 @@ public class SolvedAcSyncServiceImpl implements SolvedAcSyncService{
                         .bodyToMono(SolvedAcUserSearchResponse.class)
                         .block();
 
-        if(solvedAcUserSearchResponse.getItems().isEmpty()){
+        if(solvedAcUserSearchResponse == null || solvedAcUserSearchResponse.getItems().isEmpty()){
             return false;
         }
 
