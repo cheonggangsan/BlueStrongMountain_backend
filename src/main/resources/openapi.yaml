@@ -66,6 +66,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UsernameDuplicateResponse'
+  /api/v1/auth/existHandle:
+    get:
+      tags:
+        - Auth
+      summary: solved.ac 백준 핸들 존재 여부 확인
+      description: |
+        solved.ac `/search/user` API를 호출하여
+        해당 백준 핸들이 실제로 존재하는지 확인합니다.
+      parameters:
+        - name: handle
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 확인할 백준 핸들
+          example: fermat001
+      responses:
+        '200':
+          description: 요청 처리 성공 (존재 여부와 무관)
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '400':
+          description: 잘못된 요청 (handle 누락 또는 형식 오류)
+        '500':
+          description: solved.ac API 호출 중 서버 오류
 
   /api/v1/auth/logout:
     post:
@@ -1071,34 +1098,6 @@ paths:
           description: 잘못된 요청 (userId 누락 등)
         '404':
           description: 사용자 정보를 찾을 수 없음
-        '500':
-          description: solved.ac API 호출 중 서버 오류
-
-  /api/test/solvedac/existHandle:
-    get:
-      tags:
-        - SolvedAc (백엔드용 Test)
-      summary: solved.ac 백준 핸들 존재 여부 확인
-      description: |
-        solved.ac `/search/user` API를 호출하여
-        해당 백준 핸들이 실제로 존재하는지 확인합니다.
-      parameters:
-        - name: handle
-          in: query
-          required: true
-          schema:
-            type: string
-          description: 확인할 백준 핸들
-          example: fermat001
-      responses:
-        '200':
-          description: 요청 처리 성공 (존재 여부와 무관)
-          content:
-            application/json:
-              schema:
-                type: boolean
-        '400':
-          description: 잘못된 요청 (handle 누락 또는 형식 오류)
         '500':
           description: solved.ac API 호출 중 서버 오류
 
