@@ -23,11 +23,6 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest req){
-
-        //test
-        System.out.println("!!!!!!!!!register user");
-        System.out.println(req.toString());
-
         return ResponseEntity.ok(authService.register(req));
     }
 
@@ -54,6 +49,14 @@ public class AuthController {
             @RequestBody @Valid LogoutRequest req
     ){
         authService.logout(req);
+        return ResponseEntity.ok(BaseResponse.ok());
+    }
+
+    @PostMapping("/password/reset")
+    public ResponseEntity<BaseResponse> resetPassword(
+            @RequestBody @Valid PasswordResetRequest req
+    ){
+        authService.resetPasswordByEmail(req.getEmail());
         return ResponseEntity.ok(BaseResponse.ok());
     }
 }
