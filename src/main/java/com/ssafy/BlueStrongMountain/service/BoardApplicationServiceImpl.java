@@ -88,11 +88,17 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
         Map<Long, List<Long>> problemSolvedMap = new HashMap<>();
         Map<Long, List<Long>> userSolvedMap = new HashMap<>();
 
-        for(BoardUserProgress progress : progresses){
-            if(progress.getStatus() != BoardUserStatus.SOLVED) continue;
+        Set<Long> allUserIds = new HashSet<>();
 
+        for(BoardUserProgress progress : progresses){
             Long problemId = progress.getProblemId();
             Long userId = progress.getUserId();
+            allUserIds.add(userId);
+
+            if(progress.getStatus() != BoardUserStatus.SOLVED){
+                continue;
+            }
+
 
             problemSolvedMap
                     .computeIfAbsent(problemId, k -> new ArrayList<>())
@@ -104,7 +110,8 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
 
         //username 캐싱
         Map<Long, String> usernameMap = new HashMap<>();
-        for(Long userId : userSolvedMap.keySet()){
+        //for(Long userId : userSolvedMap.keySet()){
+        for(Long userId : allUserIds){
             String username = userRepository.findById(userId)
                     .orElseThrow(UserNotFoundException::new)
                     .getUsername();
@@ -116,13 +123,21 @@ public class BoardApplicationServiceImpl implements BoardApplicationService{
                     .stream()
                     .map(e -> new BoardProblemStatusDto(e.getKey(), e.getValue()))
                     .toList();
-        List<BoardUserStatusDto> userStatus =
-                userSolvedMap.entrySet()
-                        .stream()
-                        .map(e -> new BoardUserStatusDto(e.getKey(),
-                                usernameMap.get(e.getKey()),
-                                e.getValue()))
-                        .toList();
+
+        List<BoardUserStatusDto> userStatus = new ArrayList<>();
+        for(Long userId : allUserIds){
+
+            String username = usernameMap.get(userId);
+            List<Long> solvedProblemIds = new ArrayList<>();
+            if(userSolvedMap.get(userId) != null && !userSolvedMap.get(userId).isEmpty()){
+                solvedProblemIds = userSolvedMap.get(userId);
+            }
+            userStatus.add(new BoardUserStatusDto(
+                    userId,
+                    username,
+                    solvedProblemIds
+            ));
+        }
 
 
         return new BoardProgressResponse(
