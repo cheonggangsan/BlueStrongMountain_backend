@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -62,20 +63,36 @@ public class SolvedAcSyncServiceImpl implements SolvedAcSyncService{
 
     @Override
     public boolean existSolvedAcUser(String handle) {
-        SolvedAcUserSearchResponse solvedAcUserSearchResponse =
-                webClient.get()
-                        .uri(SOLVED_AC_USER_SEARCH_URL + "?query=" + handle)
-                        .retrieve()
-                        .bodyToMono(SolvedAcUserSearchResponse.class)
-                        .block();
-
-        if(solvedAcUserSearchResponse == null || solvedAcUserSearchResponse.getItems().isEmpty()){
+        if (handle == null || handle.isBlank()) {
             return false;
         }
 
-        return solvedAcUserSearchResponse.getItems()
-                .get(0)
-                .getHandle().equals(handle);
+        try {
+            SolvedAcUserSearchResponse response =
+                    webClient.get()
+                            .uri(SOLVED_AC_USER_SEARCH_URL + "?query=" + handle)
+                            .retrieve()
+                            .bodyToMono(SolvedAcUserSearchResponse.class)
+                            .block();
+
+            if (response == null || response.getItems() == null || response.getItems().isEmpty()) {
+                return false;
+            }
+
+            SolvedAcUserItemResponse item = response.getItems().get(0);
+            if (item == null || item.getHandle() == null) {
+                return false;
+            }
+
+            return handle.equalsIgnoreCase(item.getHandle());
+
+        } catch (WebClientResponseException e) {
+            // 4xx, 5xx (404, 429, 500 등)
+            return false;
+        } catch (Exception e) {
+            // 네트워크 오류, timeout 등
+            return false;
+        }
     }
 
     @Override
