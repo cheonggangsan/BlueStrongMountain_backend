@@ -1,6 +1,5 @@
 package com.ssafy.BlueStrongMountain.controller;
 
-import com.ssafy.BlueStrongMountain.domain.UserSolution;
 import com.ssafy.BlueStrongMountain.service.SolvedAcSyncService;
 import com.ssafy.BlueStrongMountain.service.UserSolutionService;
 import lombok.RequiredArgsConstructor;
@@ -8,9 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,6 +31,30 @@ public class SolvedAcController {
         solvedAcSyncService.syncUserSolution(userId);
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * solved.ac baekjoon handle 확인 테스트
+     *
+     *
+     */
+    @GetMapping("/existHandle")
+    public ResponseEntity<Boolean> checkBaekHandle(
+            @RequestParam String handle
+    ){
+        return ResponseEntity.ok(solvedAcSyncService.existSolvedAcUser(handle));
+    }
+    /**
+     * solved.ac 인증 여부 확인
+     */
+    @GetMapping("/verify")
+    public ResponseEntity<Boolean> verifySolvedAcAccount(
+            @RequestParam String handle,
+            @RequestParam String bio
+    ) {
+        boolean verified = solvedAcSyncService.isSolvedAcVerified(handle, bio);
+        return ResponseEntity.ok(verified);
+    }
+
 
     /**
      * 유저가 푼 문제 ID 목록 조회

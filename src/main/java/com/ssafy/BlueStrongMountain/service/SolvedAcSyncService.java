@@ -12,6 +12,12 @@ public interface SolvedAcSyncService {
     void syncUserSolution(Long userId);
 
     /**
+     *  내부 사용자 handle
+     */
+    boolean existSolvedAcUser(String handle);
+    boolean isSolvedAcVerified(String handle, String bio);
+
+    /**
      * user_solution 기준으로 solved problem ids 조회
      */
     Set<Long> getSolvedProblemIds(Long userId);

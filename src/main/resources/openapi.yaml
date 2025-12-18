@@ -1043,6 +1043,9 @@ paths:
                 type: boolean
               example: true
 
+  ########################################################
+  # SolvedAcController APIs
+  ########################################################
   /api/test/solvedac/sync:
     post:
       tags:
@@ -1070,6 +1073,84 @@ paths:
           description: 사용자 정보를 찾을 수 없음
         '500':
           description: solved.ac API 호출 중 서버 오류
+
+  /api/test/solvedac/existHandle:
+    get:
+      tags:
+        - SolvedAc (백엔드용 Test)
+      summary: solved.ac 백준 핸들 존재 여부 확인
+      description: |
+        solved.ac `/search/user` API를 호출하여
+        해당 백준 핸들이 실제로 존재하는지 확인합니다.
+      parameters:
+        - name: handle
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 확인할 백준 핸들
+          example: fermat001
+      responses:
+        '200':
+          description: 요청 처리 성공 (존재 여부와 무관)
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '400':
+          description: 잘못된 요청 (handle 누락 또는 형식 오류)
+        '500':
+          description: solved.ac API 호출 중 서버 오류
+
+  /api/test/solvedac/verify:
+    get:
+      tags:
+        - SolvedAc (백엔드용 Test)
+      summary: solved.ac Bio 기반 계정 소유 인증 (완전 일치)
+      description: |
+        solved.ac `/search/user` API를 호출하여
+        입력한 백준 핸들의 bio(자기소개)가
+        전달된 bio 문자열과 **완전히 일치하는지** 확인합니다.
+  
+        ※ 현재 구현은 `equals` 비교를 사용합니다.
+        (부분 포함 검증이 아님)
+      parameters:
+        - name: handle
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 인증할 백준 핸들
+          example: fermat001
+
+        - name: bio
+          in: query
+          required: true
+          schema:
+            type: string
+          description: solved.ac 프로필에 설정된 bio 전체 문자열
+          example: BST-7F3A92
+
+      responses:
+        '200':
+          description: Bio 인증 결과
+          content:
+            application/json:
+              schema:
+                type: boolean
+              examples:
+                verified:
+                  summary: 인증 성공
+                  value: true
+                not_verified:
+                  summary: 인증 실패
+                  value: false
+        '400':
+          description: 잘못된 요청 (필수 파라미터 누락)
+        '500':
+          description: solved.ac API 호출 실패 또는 서버 오류
+
+
 
   /api/test/solvedac/solved:
     get:

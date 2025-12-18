@@ -2,18 +2,17 @@ package com.ssafy.BlueStrongMountain.service;
 
 import com.ssafy.BlueStrongMountain.domain.User;
 import com.ssafy.BlueStrongMountain.domain.UserSolution;
-import com.ssafy.BlueStrongMountain.dto.SolvedAcProblem;
-import com.ssafy.BlueStrongMountain.dto.SolvedAcResponse;
+import com.ssafy.BlueStrongMountain.dto.*;
 import com.ssafy.BlueStrongMountain.repository.UserRepository;
 import com.ssafy.BlueStrongMountain.repository.UserSolutionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,6 +24,11 @@ import java.util.stream.Collectors;
 public class SolvedAcSyncServiceImpl implements SolvedAcSyncService{
     private static final String SOLVED_AC_URL =
             "https://solved.ac/api/v3/search/problem";
+    private static final String SOLVED_AC_USER_SEARCH_URL =
+            "https://solved.ac/api/v3/search/user";
+    private static final String SOLVED_AC_VERIFY_URL =
+            "https://solved.ac/api/v3/account/verify_credentials";
+
 
     private static final int PAGE_SIZE = 50;
 
@@ -56,6 +60,66 @@ public class SolvedAcSyncServiceImpl implements SolvedAcSyncService{
             );
         }
     }
+
+    @Override
+    public boolean existSolvedAcUser(String handle) {
+        if (handle == null || handle.isBlank()) {
+            return false;
+        }
+
+        try {
+            SolvedAcUserSearchResponse response =
+                    webClient.get()
+                            .uri(SOLVED_AC_USER_SEARCH_URL + "?query=" + handle)
+                            .retrieve()
+                            .bodyToMono(SolvedAcUserSearchResponse.class)
+                            .block();
+
+            if (response == null || response.getItems() == null || response.getItems().isEmpty()) {
+                return false;
+            }
+
+            SolvedAcUserItemResponse item = response.getItems().get(0);
+            if (item == null || item.getHandle() == null) {
+                return false;
+            }
+
+            return handle.equalsIgnoreCase(item.getHandle());
+
+        } catch (WebClientResponseException e) {
+            // 4xx, 5xx (404, 429, 500 등)
+            return false;
+        } catch (Exception e) {
+            // 네트워크 오류, timeout 등
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isSolvedAcVerified(String handle, String bio) {
+        if (handle == null || bio == null) {
+            return false;
+        }
+        try {
+            //BST-***** 예시 코드
+            SolvedAcUserSearchResponse solvedAcUserSearchResponse =
+                    webClient.get()
+                            .uri(SOLVED_AC_USER_SEARCH_URL + "?query=" + handle)
+                            .retrieve()
+                            .bodyToMono(SolvedAcUserSearchResponse.class)
+                            .block();
+
+
+
+            if(solvedAcUserSearchResponse == null || solvedAcUserSearchResponse.getItems() == null)return false;
+            return solvedAcUserSearchResponse.getItems().get(0).getBio().equals(bio);
+        } catch (Exception e) {
+            // 네트워크 오류, 5xx 등
+            return false;
+        }
+    }
+
+
 
     @Override
     @Transactional(readOnly = true)
