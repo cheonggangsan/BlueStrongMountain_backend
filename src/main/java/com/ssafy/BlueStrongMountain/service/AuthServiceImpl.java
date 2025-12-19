@@ -9,6 +9,7 @@ import com.ssafy.BlueStrongMountain.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 
@@ -95,7 +96,9 @@ public class AuthServiceImpl implements AuthService{
         userRepository.save(user);
     }
 
+    //TODO 이메일 검증 로직 따로 없음
     @Override
+    @Transactional
     public void resetPasswordByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(UserNotFoundException::new);
