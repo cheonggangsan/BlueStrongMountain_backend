@@ -736,4 +736,7 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
+### local
+application-local.properties
+
 # End of https://www.toptal.com/developers/gitignore/api/eclipse,intellij,intellij+all,intellij+iml,windows,macos,linux,gradle,maven,visualstudiocode,vue,vuejs,python,jupyternotebooks,flask,git,redis

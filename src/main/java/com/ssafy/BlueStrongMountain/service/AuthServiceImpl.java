@@ -9,6 +9,9 @@ import com.ssafy.BlueStrongMountain.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.security.SecureRandom;
 
 @Service
 @AllArgsConstructor
@@ -16,6 +19,8 @@ public class AuthServiceImpl implements AuthService{
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+
+    private final EmailService emailService;
 
     @Override
     public RegisterResponse register(RegisterRequest req) {
@@ -89,5 +94,35 @@ public class AuthServiceImpl implements AuthService{
         user = user.withRefreshToken(null);
 
         userRepository.save(user);
+    }
+
+    //TODO 이메일 검증 로직 따로 없음
+    @Override
+    @Transactional
+    public void resetPasswordByEmail(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            String newPassword = randomPasswordGenerator(PASS_LENGTH);
+            String encoded = passwordEncoder.encode(newPassword);
+
+            User updatedUser = user.withPassword(encoded);
+
+            userRepository.save(updatedUser);
+
+            emailService.sendTemporaryPassword(updatedUser.getEmail(), newPassword);
+        });
+    }
+
+    private final Integer PASS_LENGTH = 8;
+    private final String CHAR_POOL =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private String randomPasswordGenerator(int length){
+        final SecureRandom random = new SecureRandom();
+        StringBuilder sb =  new StringBuilder();
+
+        for(int i =0 ; i<length; i++){
+            int idx = random.nextInt(CHAR_POOL.length());
+            sb.append(CHAR_POOL.charAt(idx));
+        }
+        return sb.toString();
     }
 }

@@ -7,4 +7,5 @@ public interface AuthService {
     public LoginResponse login(LoginRequest req);
     public UsernameDuplicateResponse checkUsername(String username);
     void logout(LogoutRequest req);
+    void resetPasswordByEmail(String email);
 }
