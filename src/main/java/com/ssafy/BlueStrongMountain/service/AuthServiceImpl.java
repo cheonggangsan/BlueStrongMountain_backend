@@ -72,6 +72,13 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
+    public boolean confirmPassword(PasswordVerifyRequest req) {
+        User foundUser = userRepository.findById(req.getUserId())
+                .orElseThrow(AuthenticationFailedException::new);
+        return passwordEncoder.matches(req.getPassword(), foundUser.getPassword());
+    }
+
+    @Override
     public UsernameDuplicateResponse checkUsername(String username) {
 
         boolean isSameName = userRepository.findByUsername(username).isPresent();
