@@ -49,6 +49,48 @@ paths:
               schema:
                 $ref: '#/components/schemas/RegisterResponse'
 
+  /api/v1/auth/password/verify:
+    post:
+      tags:
+        - Auth
+      summary: 비밀번호 일치 여부 검증
+      description: |
+        전달된 userId에 해당하는 사용자의 비밀번호가
+        입력된 password와 일치하는지 검증합니다.
+  
+        회원 탈퇴, 비밀번호 변경 등
+        민감한 작업 전 검증 용도로 사용됩니다.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - password
+              properties:
+                userId:
+                  type: integer
+                  format: int64
+                  example: 1
+                password:
+                  type: string
+                  format: password
+                  example: "myPassword123!"
+      responses:
+        200:
+          description: 비밀번호 검증 결과
+          content:
+            application/json:
+              schema:
+                type: boolean
+                example: true
+        401:
+          description: 인증 실패 (존재하지 않는 사용자 또는 인증 실패)
+
+
+
   /api/v1/auth/duplicate/username:
     get:
       tags: [Auth]
