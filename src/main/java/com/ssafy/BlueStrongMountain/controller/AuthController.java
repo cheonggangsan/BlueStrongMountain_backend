@@ -5,7 +5,6 @@ import com.ssafy.BlueStrongMountain.service.AuthService;
 import com.ssafy.BlueStrongMountain.service.SolvedAcSyncService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +23,13 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest req){
         return ResponseEntity.ok(authService.register(req));
+    }
+
+    @PostMapping("/password/verify")
+    public ResponseEntity<Boolean> verifyPassword(
+            @RequestBody PasswordVerifyRequest request
+    ) {
+        return ResponseEntity.ok(authService.confirmPassword(request));
     }
 
     @GetMapping("/duplicate/username")
