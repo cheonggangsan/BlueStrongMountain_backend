@@ -100,17 +100,16 @@ public class AuthServiceImpl implements AuthService{
     @Override
     @Transactional
     public void resetPasswordByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
+        userRepository.findByEmail(email).ifPresent(user -> {
+            String newPassword = randomPasswordGenerator(PASS_LENGTH);
+            String encoded = passwordEncoder.encode(newPassword);
 
-        String newPassword = randomPasswordGenerator(PASS_LENGTH);
-        String encoded = passwordEncoder.encode(newPassword);
+            User updatedUser = user.withPassword(encoded);
 
-        User updatedUser = user.withPassword(encoded);
+            userRepository.save(updatedUser);
 
-        userRepository.save(updatedUser);
-
-        emailService.sendTemporaryPassword(updatedUser.getEmail(), newPassword);
+            emailService.sendTemporaryPassword(updatedUser.getEmail(), newPassword);
+        });
     }
 
     private final Integer PASS_LENGTH = 8;
