@@ -1010,6 +1010,19 @@ paths:
           schema:
             type: boolean
 
+        - name: option
+          in: query
+          required: false
+          schema:
+            type: integer
+            enum: [ 0, 1, 2 ]
+            default: 0
+          description: >
+            추가 옵션  
+            0: 전체 결과 반환  
+            1: 랜덤 5문제 반환 (중복 없음)
+            2: AI 추천 기능
+
       responses:
         '200':
           description: Filtered list
