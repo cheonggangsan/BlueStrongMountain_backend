@@ -15,9 +15,11 @@ public class ProblemFilterRequest {
     private final List<String> tags;
     private final Integer minSolvers;
     private final Boolean unsolved;
+    private final Integer option;
 
     public ProblemFilterRequest(String mode, List<Long> problemIds, Integer difficultyFrom, Integer difficultyTo,
-                                List<String> tags, Integer minSolvers, Boolean unsolved) {
+                                List<String> tags, Integer minSolvers, Boolean unsolved,
+                                Integer option) {
         this.mode = (mode != null && !mode.isEmpty()) ? mode : "normal";  // 기본값 처리
         this.problemIds = problemIds != null ? problemIds : Collections.emptyList();
         this.difficultyFrom = difficultyFrom != null ? difficultyFrom : 0;
@@ -25,6 +27,8 @@ public class ProblemFilterRequest {
         this.tags = tags != null ? tags : Collections.emptyList();
         this.minSolvers = minSolvers != null ? minSolvers : 0;
         this.unsolved = unsolved != null ? unsolved : true;
+        this.option = option != null ? option : 0;
+
     }
 
     @Override
@@ -37,6 +41,7 @@ public class ProblemFilterRequest {
                 ", tags=" + tags +
                 ", minSolvers=" + minSolvers +
                 ", unsolved=" + unsolved +
+                ", option=" + option +
                 '}';
     }
 }

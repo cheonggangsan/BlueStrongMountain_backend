@@ -37,7 +37,8 @@ public class ProblemFilterController {
             @RequestParam(required = false) Integer difficultyTo,
             @RequestParam(required = false) List<String> tags,
             @RequestParam(required = false) Integer minSolvers,
-            @RequestParam(required = false) Boolean unsolved
+            @RequestParam(required = false) Boolean unsolved,
+            @RequestParam(required = false) Integer option
     ) {
 
         ProblemFilterRequest request = new ProblemFilterRequest(
@@ -47,7 +48,8 @@ public class ProblemFilterController {
                 difficultyTo,
                 tags,
                 minSolvers,
-                unsolved
+                unsolved,
+                option
         );
         System.out.println("test request DTO");
         System.out.println(request.toString());

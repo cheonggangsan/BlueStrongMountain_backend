@@ -2,6 +2,10 @@ package com.ssafy.BlueStrongMountain.service;
 
 import com.ssafy.BlueStrongMountain.dto.ProblemDto;
 import com.ssafy.BlueStrongMountain.dto.ProblemFilterRequest;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -11,12 +15,28 @@ public class ProblemFilterServiceImpl implements ProblemFilterService{
 
     @Override
     public List<ProblemDto> applyFilters(List<ProblemDto> base, ProblemFilterRequest req) {
-        return base.stream()
+
+        List<ProblemDto> filterRet = base.stream()
                 .filter(p -> filterByProblemIds(req, p))
                 .filter(p -> filterByDifficulty(req, p))
                 .filter(p -> filterByTags(req, p))
                 .filter(p -> filterByMinSolvers(req, p))
                 .toList();
+
+        if(req.getOption() == 1){
+            if(filterRet.isEmpty()){
+                return List.of();
+            }
+            List<ProblemDto> shuffledList = new ArrayList<>(filterRet);
+            Collections.shuffle(shuffledList);
+
+            return shuffledList.subList(0, Math.min(5, shuffledList.size()));
+        }
+        if(req.getOption() == 2){
+
+            return new ArrayList<>();
+        }
+        return filterRet;
     }
     private boolean filterByProblemIds(ProblemFilterRequest req, ProblemDto p) {
        // System.out.println("filter problem ID here?!!?!??!?!!?!!!!!!!!!!!???????????????????????????????????");//test
