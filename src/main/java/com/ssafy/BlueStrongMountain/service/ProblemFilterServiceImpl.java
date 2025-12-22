@@ -34,10 +34,12 @@ public class ProblemFilterServiceImpl implements ProblemFilterService{
             if(effectiveReq.getMinSolvers() == 0)
                 effectiveReq = effectiveReq.withMinSolvers(100);
             //그룹에서의 해결 문제 평균으로 탐색
-            if(effectiveReq.getDifficultyFrom() == 0 &&
+            if(effectiveReq.getDifficultyFrom() == 1 &&
                     effectiveReq.getDifficultyTo() == 35){
                 int groupLevel = (int) groupAnalysisService.calculateAverageDifficultyByGroupId(groupId);
-                int difficultyFrom = Math.max(groupLevel - 1, 0);
+                groupLevel = Math.max(groupLevel, 1);
+
+                int difficultyFrom = Math.max(groupLevel - 1, 1);
                 int difficultyTo = Math.min(groupLevel + 1, 35);
                 effectiveReq = effectiveReq.withDifficulty(difficultyFrom, difficultyTo);
             }

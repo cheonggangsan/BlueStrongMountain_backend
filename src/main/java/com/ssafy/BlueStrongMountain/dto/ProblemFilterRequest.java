@@ -22,7 +22,7 @@ public class ProblemFilterRequest {
                                 Integer option) {
         this.mode = (mode != null && !mode.isEmpty()) ? mode : "normal";  // 기본값 처리
         this.problemIds = problemIds != null ? problemIds : Collections.emptyList();
-        this.difficultyFrom = difficultyFrom != null ? difficultyFrom : 0;
+        this.difficultyFrom = difficultyFrom != null ? difficultyFrom : 1;
         this.difficultyTo = difficultyTo != null ? difficultyTo : 35;
         this.tags = tags != null ? tags : Collections.emptyList();
         this.minSolvers = minSolvers != null ? minSolvers : 0;
