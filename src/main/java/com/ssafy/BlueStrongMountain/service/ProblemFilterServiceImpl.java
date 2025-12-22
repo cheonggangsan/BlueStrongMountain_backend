@@ -7,34 +7,62 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ProblemFilterServiceImpl implements ProblemFilterService{
+
+    private final GroupAnalysisService groupAnalysisService;
 
 
     @Override
-    public List<ProblemDto> applyFilters(List<ProblemDto> base, ProblemFilterRequest req) {
+    public List<ProblemDto> applyFilters(Long groupId, List<ProblemDto> base, ProblemFilterRequest req) {
+
+        ProblemFilterRequest effectiveReq = req;
+
+
+        //FIXME random 기능에도 추천 기능 적용되고 있음
+        if((req.getOption() == 2 || req.getOption() == 1) && req.getTags().isEmpty()){
+            //group 분석해서 추천 태그 설정
+            List<String> recommendTags = groupAnalysisService.recommendTagsByGroup(groupId);
+
+            effectiveReq = req.withTags(recommendTags);
+            //최소 해결자 100명 이상
+            if(effectiveReq.getMinSolvers() == 0)
+                effectiveReq = effectiveReq.withMinSolvers(100);
+            //그룹에서의 해결 문제 평균으로 탐색
+            if(effectiveReq.getDifficultyFrom() == 1 &&
+                    effectiveReq.getDifficultyTo() == 35){
+                int groupLevel = (int) groupAnalysisService.calculateAverageDifficultyByGroupId(groupId);
+                groupLevel = Math.max(groupLevel, 1);
+
+                int difficultyFrom = Math.max(groupLevel - 1, 1);
+                int difficultyTo = Math.min(groupLevel + 1, 35);
+                effectiveReq = effectiveReq.withDifficulty(difficultyFrom, difficultyTo);
+            }
+        }
+        ProblemFilterRequest finalReq = effectiveReq;
 
         List<ProblemDto> filterRet = base.stream()
-                .filter(p -> filterByProblemIds(req, p))
-                .filter(p -> filterByDifficulty(req, p))
-                .filter(p -> filterByTags(req, p))
-                .filter(p -> filterByMinSolvers(req, p))
+                .filter(p -> filterByProblemIds(finalReq, p))
+                .filter(p -> filterByDifficulty(finalReq, p))
+                .filter(p -> filterByTags(finalReq, p))
+                .filter(p -> filterByMinSolvers(finalReq, p))
                 .toList();
 
-        if(req.getOption() == 1){
+        //FIXME random 기능에도 추천 기능 적용되고 있음
+        if(req.getOption() == 1 || req.getOption() == 2){
             if(filterRet.isEmpty()){
                 return List.of();
             }
             List<ProblemDto> shuffledList = new ArrayList<>(filterRet);
             Collections.shuffle(shuffledList);
 
-            return shuffledList.subList(0, Math.min(5, shuffledList.size()));
-        }
-        if(req.getOption() == 2){
 
-            return new ArrayList<>();
+            return shuffledList.subList(0, Math.min(5, shuffledList.size()));
         }
         return filterRet;
     }

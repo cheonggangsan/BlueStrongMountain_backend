@@ -22,13 +22,50 @@ public class ProblemFilterRequest {
                                 Integer option) {
         this.mode = (mode != null && !mode.isEmpty()) ? mode : "normal";  // 기본값 처리
         this.problemIds = problemIds != null ? problemIds : Collections.emptyList();
-        this.difficultyFrom = difficultyFrom != null ? difficultyFrom : 0;
+        this.difficultyFrom = difficultyFrom != null ? difficultyFrom : 1;
         this.difficultyTo = difficultyTo != null ? difficultyTo : 35;
         this.tags = tags != null ? tags : Collections.emptyList();
         this.minSolvers = minSolvers != null ? minSolvers : 0;
         this.unsolved = unsolved != null ? unsolved : true;
         this.option = option != null ? option : 0;
 
+    }
+
+    public ProblemFilterRequest withTags(List<String> tags) {
+        return new ProblemFilterRequest(
+                this.mode,
+                this.problemIds,
+                this.difficultyFrom,
+                this.difficultyTo,
+                tags,
+                this.minSolvers,
+                this.unsolved,
+                this.option
+        );
+    }
+    public ProblemFilterRequest withMinSolvers(int minSolvers) {
+        return new ProblemFilterRequest(
+                this.mode,
+                this.problemIds,
+                this.difficultyFrom,
+                this.difficultyTo,
+                this.tags,
+                Math.max(minSolvers, 0),
+                this.unsolved,
+                this.option
+        );
+    }
+    public ProblemFilterRequest withDifficulty(int difficultyFrom, int difficultyTo) {
+        return new ProblemFilterRequest(
+                this.mode,
+                this.problemIds,
+                difficultyFrom,
+                difficultyTo,
+                this.tags,
+                this.minSolvers,
+                this.unsolved,
+                this.option
+        );
     }
 
     @Override
