@@ -6,10 +6,7 @@ import com.ssafy.BlueStrongMountain.dto.GroupDetailDto;
 import com.ssafy.BlueStrongMountain.dto.GroupSummaryDto;
 import com.ssafy.BlueStrongMountain.dto.GroupUpdateRequest;
 import com.ssafy.BlueStrongMountain.exception.GroupNotFoundException;
-import com.ssafy.BlueStrongMountain.repository.BoardRepository;
-import com.ssafy.BlueStrongMountain.repository.BoardUserProgressRepository;
-import com.ssafy.BlueStrongMountain.repository.GroupRepository;
-import com.ssafy.BlueStrongMountain.repository.UserGroupRepository;
+import com.ssafy.BlueStrongMountain.repository.*;
 
 import com.ssafy.BlueStrongMountain.service.validator.GroupAuthorityService;
 import com.ssafy.BlueStrongMountain.service.validator.GroupValidator;
@@ -33,6 +30,7 @@ public class GroupServiceImpl implements GroupService {
 
     private final BoardUserProgressRepository boardUserProgressRepository;
     private final BoardRepository boardRepository;
+    private final BoardProblemRepository boardProblemRepository;
 
 
     @Override
@@ -110,7 +108,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<GroupSummaryDto> findMyGroups(final Long requesterId) {
-        //TODO db 접근 비효율성
+        //FIXME db 접근 비효율성
         List<UserGroup> myGroups = userGroupRepository.findByUserId(requesterId);
         final List<Long> myGroupIds = myGroups.stream()
                 .map(UserGroup::getGroupId)
@@ -265,6 +263,15 @@ public class GroupServiceImpl implements GroupService {
         newAll.addAll(newManagerIds);
         newAll.addAll(newMemberIds);
 
+        List<Long> newUserIds = newAll.stream()
+                .filter(userId -> (!oldUserMap.containsKey(userId)))
+                .toList();
+
+
+        addBoardUserProgress(groupId, newUserIds);
+
+
+        //기존 삭제
         List<Long> toDeleteIds = oldUserMap.keySet().stream()
                 .filter(userId -> (!newAll.contains(userId)))
                 .filter(userId -> !userId.equals(requesterId))
@@ -330,7 +337,7 @@ public class GroupServiceImpl implements GroupService {
 
         cleanupBoardUserProgress(groupId, deleteUserIds);
 
-        //TODO n+1 문제 있음
+        //FIXME n+1 문제 있음
         for(Long userId : deleteUserIds){
             userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
         }
@@ -370,5 +377,41 @@ public class GroupServiceImpl implements GroupService {
                 boardId,
                 userId
         );
+    }
+
+
+    private void addBoardUserProgress(
+            Long groupId,
+            List<Long> newUserIds
+    ){
+        List<Board> boards = boardRepository.findByGroupId(groupId);
+        LocalDateTime curTime = LocalDateTime.now();
+
+        for(Board board : boards){
+            if(curTime.isAfter(board.getEndTime()))
+                continue;
+            for(Long userId : newUserIds){
+                addUserProgressInBoard(board.getId(), userId);
+            }
+        }
+    }
+
+    private void addUserProgressInBoard(
+            Long boardId,
+            Long userId
+    ){
+        List<Long> problemIds =
+                boardProblemRepository.findByBoardId(boardId)
+                        .stream()
+                        .map(BoardProblem::getProblemId)
+                        .toList();
+
+        List<BoardUserProgress> boardUserProgresses = new ArrayList<>();
+        for(Long problemId : problemIds){
+            boardUserProgresses.add(
+                    new BoardUserProgress(boardId, userId, problemId)
+            );
+        }
+        boardUserProgressRepository.saveAll(boardUserProgresses);
     }
 }
