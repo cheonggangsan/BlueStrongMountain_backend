@@ -108,7 +108,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<GroupSummaryDto> findMyGroups(final Long requesterId) {
-        //TODO db 접근 비효율성
+        //FIXME db 접근 비효율성
         List<UserGroup> myGroups = userGroupRepository.findByUserId(requesterId);
         final List<Long> myGroupIds = myGroups.stream()
                 .map(UserGroup::getGroupId)
@@ -258,8 +258,6 @@ public class GroupServiceImpl implements GroupService {
             }
         }
 
-        //TODO boardUserProgress에 업데이트
-        //TODO 신규 인원 배열 설정
         //기존 삭제
         Set<Long> newAll = new HashSet<>();
         newAll.addAll(newManagerIds);
@@ -339,7 +337,7 @@ public class GroupServiceImpl implements GroupService {
 
         cleanupBoardUserProgress(groupId, deleteUserIds);
 
-        //TODO n+1 문제 있음
+        //FIXME n+1 문제 있음
         for(Long userId : deleteUserIds){
             userGroupRepository.deleteByUserIdAndGroupId(userId, groupId);
         }
