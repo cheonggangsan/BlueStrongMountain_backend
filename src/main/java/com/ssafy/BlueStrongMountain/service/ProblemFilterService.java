@@ -5,5 +5,5 @@ import com.ssafy.BlueStrongMountain.dto.ProblemFilterRequest;
 import java.util.List;
 
 public interface ProblemFilterService {
-    List<ProblemDto> applyFilters(List<ProblemDto> base, ProblemFilterRequest request);
+    List<ProblemDto> applyFilters(Long groupId, List<ProblemDto> base, ProblemFilterRequest request);
 }

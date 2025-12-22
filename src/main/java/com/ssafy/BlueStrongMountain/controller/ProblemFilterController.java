@@ -70,7 +70,7 @@ public class ProblemFilterController {
 //        }
 
 
-        List<ProblemDto> filtered = filterService.applyFilters(base, request);
+        List<ProblemDto> filtered = filterService.applyFilters(groupId, base, request);
 
 //
         System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");//test
