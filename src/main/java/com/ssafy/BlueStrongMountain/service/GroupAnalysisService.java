@@ -7,6 +7,7 @@ import java.util.Map;
 
 public interface GroupAnalysisService {
 
-    Map<String, Long> getGroupTags(Long groupId);
+
+    Map<String, Long> countSolvedProblemTagsByGroupId(Long groupId);
     List<ProblemDto> fetchProblemsByGroupId(Long groupId);
 }

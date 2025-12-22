@@ -16,7 +16,7 @@ public class GroupAnalysisServiceImpl implements GroupAnalysisService{
     private final BoardRepository boardRepository;
 
     @Override
-    public Map<String, Long> getGroupTags(Long groupId) {
+    public Map<String, Long> countSolvedProblemTagsByGroupId(Long groupId) {
         Map<String, Long> tagCountByCategory = new HashMap<>();
 
         List<ProblemDto> problems = fetchProblemsByGroupId(groupId);
