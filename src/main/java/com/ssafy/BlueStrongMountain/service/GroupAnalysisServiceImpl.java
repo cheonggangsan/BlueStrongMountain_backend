@@ -77,7 +77,7 @@ public class GroupAnalysisServiceImpl implements GroupAnalysisService{
         tagCountByCategory.put("String", 0L);
         tagCountByCategory.put("Math", 0L);
         tagCountByCategory.put("Search", 0L);
-        tagCountByCategory.put("BruteForce", 0L);
+        tagCountByCategory.put("Bruteforce", 0L);
         tagCountByCategory.put("Implementation", 0L);
 
 
@@ -93,13 +93,6 @@ public class GroupAnalysisServiceImpl implements GroupAnalysisService{
                 );
             }
         }
-
-        //TODO erase this
-        for(String key : tagCountByCategory.keySet()){
-            System.out.println(key + " " + tagCountByCategory.get(key));
-        }
-
-
 
         return tagCountByCategory;
     }
