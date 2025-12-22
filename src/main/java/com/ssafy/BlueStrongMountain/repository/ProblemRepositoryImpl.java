@@ -1,6 +1,7 @@
 package com.ssafy.BlueStrongMountain.repository;
 
 import com.ssafy.BlueStrongMountain.dto.ProblemDto;
+import com.ssafy.BlueStrongMountain.dto.ProblemFilterCondition;
 import com.ssafy.BlueStrongMountain.repository.mapper.ProblemMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -25,5 +26,28 @@ public class ProblemRepositoryImpl implements ProblemRepository {
             return Collections.emptyList();
         }
         return problemMapper.findByIdList(ids);
+    }
+
+    @Override
+    public List<ProblemDto> findByCondition(
+            Long groupId,
+            boolean unsolved,
+            ProblemFilterCondition cond
+    ) {
+        if (unsolved) {
+            return problemMapper.findUnsolvedProblemsByGroup(
+                    groupId,
+                    cond.getDifficultyFrom(),
+                    cond.getDifficultyTo(),
+                    cond.getTags(),
+                    cond.getMinSolvers()
+            );
+        }
+        return problemMapper.findProblems(
+                cond.getDifficultyFrom(),
+                cond.getDifficultyTo(),
+                cond.getTags(),
+                cond.getMinSolvers()
+        );
     }
 }
