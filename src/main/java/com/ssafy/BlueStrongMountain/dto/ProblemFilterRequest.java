@@ -31,6 +31,43 @@ public class ProblemFilterRequest {
 
     }
 
+    public ProblemFilterRequest withTags(List<String> tags) {
+        return new ProblemFilterRequest(
+                this.mode,
+                this.problemIds,
+                this.difficultyFrom,
+                this.difficultyTo,
+                tags,
+                this.minSolvers,
+                this.unsolved,
+                this.option
+        );
+    }
+    public ProblemFilterRequest withMinSolvers(int minSolvers) {
+        return new ProblemFilterRequest(
+                this.mode,
+                this.problemIds,
+                this.difficultyFrom,
+                this.difficultyTo,
+                this.tags,
+                minSolvers,
+                this.unsolved,
+                this.option
+        );
+    }
+    public ProblemFilterRequest withDifficulty(int difficultyFrom, int difficultyTo) {
+        return new ProblemFilterRequest(
+                this.mode,
+                this.problemIds,
+                difficultyFrom,
+                difficultyTo,
+                this.tags,
+                this.minSolvers,
+                this.unsolved,
+                this.option
+        );
+    }
+
     @Override
     public String toString() {
         return "ProblemFilterRequest{" +
