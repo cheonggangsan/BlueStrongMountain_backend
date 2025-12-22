@@ -6,10 +6,7 @@ import com.ssafy.BlueStrongMountain.dto.GroupDetailDto;
 import com.ssafy.BlueStrongMountain.dto.GroupSummaryDto;
 import com.ssafy.BlueStrongMountain.dto.GroupUpdateRequest;
 import com.ssafy.BlueStrongMountain.exception.GroupNotFoundException;
-import com.ssafy.BlueStrongMountain.repository.BoardRepository;
-import com.ssafy.BlueStrongMountain.repository.BoardUserProgressRepository;
-import com.ssafy.BlueStrongMountain.repository.GroupRepository;
-import com.ssafy.BlueStrongMountain.repository.UserGroupRepository;
+import com.ssafy.BlueStrongMountain.repository.*;
 
 import com.ssafy.BlueStrongMountain.service.validator.GroupAuthorityService;
 import com.ssafy.BlueStrongMountain.service.validator.GroupValidator;
@@ -33,6 +30,7 @@ public class GroupServiceImpl implements GroupService {
 
     private final BoardUserProgressRepository boardUserProgressRepository;
     private final BoardRepository boardRepository;
+    private final BoardProblemRepository boardProblemRepository;
 
 
     @Override
@@ -260,11 +258,22 @@ public class GroupServiceImpl implements GroupService {
             }
         }
 
+        //TODO boardUserProgress에 업데이트
+        //TODO 신규 인원 배열 설정
         //기존 삭제
         Set<Long> newAll = new HashSet<>();
         newAll.addAll(newManagerIds);
         newAll.addAll(newMemberIds);
 
+        List<Long> newUserIds = newAll.stream()
+                .filter(userId -> (!oldUserMap.containsKey(userId)))
+                .toList();
+
+
+        addBoardUserProgress(groupId, newUserIds);
+
+
+        //기존 삭제
         List<Long> toDeleteIds = oldUserMap.keySet().stream()
                 .filter(userId -> (!newAll.contains(userId)))
                 .filter(userId -> !userId.equals(requesterId))
@@ -370,5 +379,45 @@ public class GroupServiceImpl implements GroupService {
                 boardId,
                 userId
         );
+    }
+
+
+    private void addBoardUserProgress(
+            Long groupId,
+            List<Long> newUserIds
+    ){
+        List<Board> boards = boardRepository.findByGroupId(groupId);
+
+        for(Board board : boards){
+            if(LocalDateTime.now().isAfter(board.getEndTime()))
+                continue;
+            for(Long userId : newUserIds){
+                addUserProgressInBoard(board.getId(), userId);
+            }
+        }
+    }
+
+    private void addUserProgressInBoard(
+            Long boardId,
+            Long userId
+    ){
+        List<Long> problemIds =
+                boardProblemRepository.findByBoardId(boardId)
+                        .stream()
+                        .map(BoardProblem::getProblemId)
+                        .toList();
+
+        for(Long problemId : problemIds){
+            if(boardUserProgressRepository
+                    .find(boardId, userId, problemId).isPresent())
+                continue;
+            boardUserProgressRepository.save(
+                    new BoardUserProgress(
+                            boardId,
+                            userId,
+                            problemId
+                    )
+            );
+        }
     }
 }
