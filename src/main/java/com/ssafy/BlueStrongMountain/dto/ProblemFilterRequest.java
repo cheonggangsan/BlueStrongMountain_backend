@@ -50,7 +50,7 @@ public class ProblemFilterRequest {
                 this.difficultyFrom,
                 this.difficultyTo,
                 this.tags,
-                minSolvers,
+                Math.max(minSolvers, 0),
                 this.unsolved,
                 this.option
         );

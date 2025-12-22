@@ -31,11 +31,11 @@ public class ProblemFilterServiceImpl implements ProblemFilterService{
 
             effectiveReq = req.withTags(recommendTags);
             //최소 해결자 100명 이상
-            if(req.getMinSolvers() == 0)
+            if(effectiveReq.getMinSolvers() == 0)
                 effectiveReq = effectiveReq.withMinSolvers(100);
             //그룹에서의 해결 문제 평균으로 탐색
-            if(req.getDifficultyFrom() == 0 &&
-                    req.getDifficultyTo() == 35){
+            if(effectiveReq.getDifficultyFrom() == 0 &&
+                    effectiveReq.getDifficultyTo() == 35){
                 int groupLevel = (int) groupAnalysisService.calculateAverageDifficultyByGroupId(groupId);
                 int difficultyFrom = Math.max(groupLevel - 1, 0);
                 int difficultyTo = Math.min(groupLevel + 1, 35);
