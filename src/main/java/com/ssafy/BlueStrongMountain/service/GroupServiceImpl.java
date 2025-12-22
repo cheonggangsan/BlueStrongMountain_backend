@@ -385,9 +385,10 @@ public class GroupServiceImpl implements GroupService {
             List<Long> newUserIds
     ){
         List<Board> boards = boardRepository.findByGroupId(groupId);
+        LocalDateTime curTime = LocalDateTime.now();
 
         for(Board board : boards){
-            if(LocalDateTime.now().isAfter(board.getEndTime()))
+            if(curTime.isAfter(board.getEndTime()))
                 continue;
             for(Long userId : newUserIds){
                 addUserProgressInBoard(board.getId(), userId);
@@ -405,17 +406,12 @@ public class GroupServiceImpl implements GroupService {
                         .map(BoardProblem::getProblemId)
                         .toList();
 
+        List<BoardUserProgress> boardUserProgresses = new ArrayList<>();
         for(Long problemId : problemIds){
-            if(boardUserProgressRepository
-                    .find(boardId, userId, problemId).isPresent())
-                continue;
-            boardUserProgressRepository.save(
-                    new BoardUserProgress(
-                            boardId,
-                            userId,
-                            problemId
-                    )
+            boardUserProgresses.add(
+                    new BoardUserProgress(boardId, userId, problemId)
             );
         }
+        boardUserProgressRepository.saveAll(boardUserProgresses);
     }
 }
