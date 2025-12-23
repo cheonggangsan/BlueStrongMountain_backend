@@ -64,6 +64,14 @@ public class GmsOpenAiEmbeddingClient {
         }
 
         EmbeddingResponse parsed = om.readValue(response.body(), EmbeddingResponse.class);
+
+        if (parsed == null || parsed.data() == null || parsed.data().isEmpty()) {
+            throw new RuntimeException("Embedding 응답이 비어있습니다.");
+        }
+        if (parsed.data().get(0).embedding() == null) {
+            throw new RuntimeException("Embedding 데이터가 null입니다.");
+        }
+
         List<Double> embD = parsed.data().get(0).embedding();
 
         return embD.stream().map(Double::floatValue).toList();
