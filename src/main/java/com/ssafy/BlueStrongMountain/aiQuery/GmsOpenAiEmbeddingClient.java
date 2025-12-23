@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.net.http.*;
+import java.time.Duration;
 import java.util.List;
 
 @Service
@@ -16,7 +17,9 @@ public class GmsOpenAiEmbeddingClient {
     private final String apiKey;
     private final String embeddingModel;
 
-    private final HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient client = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
     private final ObjectMapper om = new ObjectMapper();
 
     public GmsOpenAiEmbeddingClient(
@@ -54,6 +57,7 @@ public class GmsOpenAiEmbeddingClient {
                 .uri(URI.create(openAiApiUrl))
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer " + apiKey)
+                .timeout(Duration.ofSeconds(30))
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
 
