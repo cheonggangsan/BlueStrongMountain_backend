@@ -1,35 +1,44 @@
 package com.ssafy.BlueStrongMountain.aiQuery;
 
-import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
-import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @Component
 public class InMemoryBojEmbeddingIndex {
 
-    public record Entry(int problemId, float[] vec) {}
-    public record Hit(int problemId, double score) {}
+    public record Entry(int problemId, float[] vec) {
+    }
+
+    public record Hit(int problemId, double score) {
+    }
 
     private static final ObjectMapper om = new ObjectMapper();
-    private final File jsonFile;
+    private final Resource jsonResource;
 
     private List<Entry> entries = List.of();
 
-    public InMemoryBojEmbeddingIndex(@Value("${boj.embedding.json}") String embeddingFileLocation) {
-        this.jsonFile = new File(embeddingFileLocation);
+    public InMemoryBojEmbeddingIndex(
+            @Value("${boj.embedding.json}") String embeddingFileLocation,
+            ResourceLoader resourceLoader) {
+        this.jsonResource = resourceLoader.getResource(embeddingFileLocation);
     }
 
     @PostConstruct
-    public void loadOnce() throws Exception {
+    public void loadOnce() throws IOException {
         List<Entry> loaded = new ArrayList<>();
 
         JsonFactory factory = om.getFactory();
-        try (JsonParser p = factory.createParser(jsonFile)) {
+        try (JsonParser p = factory.createParser(jsonResource.getInputStream())) {
 
             if (p.nextToken() != JsonToken.START_ARRAY) {
                 throw new IllegalArgumentException("JSON이 배열([ ... ]) 형태가 아닙니다.");
@@ -59,7 +68,10 @@ public class InMemoryBojEmbeddingIndex {
         for (Entry e : entries) {
             double score = dot(q, e.vec);
             if (heap.size() < topK) heap.add(new Hit(e.problemId, score));
-            else if (score > heap.peek().score) { heap.poll(); heap.add(new Hit(e.problemId, score)); }
+            else if (score > heap.peek().score) {
+                heap.poll();
+                heap.add(new Hit(e.problemId, score));
+            }
         }
 
         List<Hit> hits = new ArrayList<>(heap);
