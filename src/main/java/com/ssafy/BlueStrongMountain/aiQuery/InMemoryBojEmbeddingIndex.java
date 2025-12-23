@@ -82,6 +82,9 @@ public class InMemoryBojEmbeddingIndex {
     }
 
     private double dot(float[] a, float[] b) {
+        if (a.length != b.length) {
+            System.out.println("Vector dimension mismatch: " + a.length + " vs " + b.length);
+        }
         int n = Math.min(a.length, b.length);
         double s = 0;
         for (int i = 0; i < n; i++) s += (double) a[i] * b[i];
