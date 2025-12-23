@@ -72,11 +72,16 @@ public class InMemoryBojEmbeddingIndex {
         double normSq = 0;
         for (int i = 0; i < list.size(); i++) {
             float x = list.get(i);
+            if (!Float.isFinite(x)) {
+                throw new IllegalArgumentException("Embedding contains non-finite value at index " + i + ": " + x);
+            }
             v[i] = x;
             normSq += (double) x * x;
         }
         double norm = Math.sqrt(normSq);
-        if (norm == 0) return v;
+        if (norm == 0 || !Double.isFinite(norm)) {
+            throw new IllegalArgumentException("Embedding has zero or non-finite norm: " + norm);
+        }
         for (int i = 0; i < v.length; i++) v[i] = (float) (v[i] / norm);
         return v;
     }
