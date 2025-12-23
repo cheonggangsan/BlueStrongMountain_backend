@@ -1,4 +1,3 @@
-// EmbeddingService.java
 package com.ssafy.BlueStrongMountain.aiQuery;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
