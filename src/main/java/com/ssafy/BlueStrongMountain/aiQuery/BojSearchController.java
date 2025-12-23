@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// TOOD: add validation, response DTO, api rate limiting
 @RestController
 public class BojSearchController {
 
