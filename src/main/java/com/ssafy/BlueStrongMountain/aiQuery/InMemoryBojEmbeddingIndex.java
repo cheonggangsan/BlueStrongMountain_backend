@@ -115,6 +115,7 @@ public class InMemoryBojEmbeddingIndex {
 
     private double dot(float[] a, float[] b) {
         if (a.length != b.length) {
+            // TODO: apply SLF4J
             System.out.println("Vector dimension mismatch: " + a.length + " vs " + b.length);
         }
         int n = Math.min(a.length, b.length);
