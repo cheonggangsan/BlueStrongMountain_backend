@@ -37,27 +37,33 @@ public class InMemoryBojEmbeddingIndex {
     public void loadOnce() throws IOException {
         List<Entry> loaded = new ArrayList<>();
 
-        JsonFactory factory = om.getFactory();
-        try (JsonParser p = factory.createParser(jsonResource.getInputStream())) {
+        try {
+            JsonFactory factory = om.getFactory();
+            try (JsonParser p = factory.createParser(jsonResource.getInputStream())) {
+                if (p.nextToken() != JsonToken.START_ARRAY) {
+                    throw new IllegalArgumentException("JSON이 배열([ ... ]) 형태가 아닙니다.");
+                }
 
-            if (p.nextToken() != JsonToken.START_ARRAY) {
-                throw new IllegalArgumentException("JSON이 배열([ ... ]) 형태가 아닙니다.");
+                while (p.nextToken() == JsonToken.START_OBJECT) {
+                    BojChunkDocument chunk = om.readValue(p, BojChunkDocument.class);
+
+                    Integer pid = chunk.extractProblemId();
+                    var emb = chunk.getEmbedding();
+                    if (pid == null || emb == null || emb.isEmpty()) continue;
+
+                    float[] v = toUnitFloatArray(emb);
+                    loaded.add(new Entry(pid, v));
+                }
             }
 
-            while (p.nextToken() == JsonToken.START_OBJECT) {
-                BojChunkDocument chunk = om.readValue(p, BojChunkDocument.class);
-
-                Integer pid = chunk.extractProblemId();
-                var emb = chunk.getEmbedding();
-                if (pid == null || emb == null || emb.isEmpty()) continue;
-
-                float[] v = toUnitFloatArray(emb);
-                loaded.add(new Entry(pid, v));
-            }
+            this.entries = Collections.unmodifiableList(loaded);
+            // TODO: Use logger instead of System.out.println (see separate comment)
+            System.out.println("Loaded vectors: " + this.entries.size());
+        } catch (IOException e) {
+            throw new IOException("Failed to load embedding index from: " + jsonResource.getURI().getPath(), e);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to initialize embedding index", e);
         }
-
-        this.entries = Collections.unmodifiableList(loaded);
-        System.out.println("Loaded vectors: " + this.entries.size());
     }
 
     public List<Hit> searchTopK(List<Float> queryEmbedding, int topK) {
