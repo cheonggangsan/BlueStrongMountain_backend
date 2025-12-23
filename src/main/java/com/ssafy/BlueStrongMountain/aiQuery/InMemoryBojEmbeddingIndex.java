@@ -1,7 +1,7 @@
 package com.ssafy.BlueStrongMountain.aiQuery;
 
 import com.fasterxml.jackson.core.*;
-        import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
