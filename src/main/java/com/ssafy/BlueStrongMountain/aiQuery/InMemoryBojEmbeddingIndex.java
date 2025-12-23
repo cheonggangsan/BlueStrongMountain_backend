@@ -82,7 +82,7 @@ public class InMemoryBojEmbeddingIndex {
 
         for (Entry e : entries) {
             double score = dot(q, e.vec);
-            if (heap.size() < topK) heap.add(new Hit(e.problemId, score));
+            if (heap.size() < effectiveK) heap.add(new Hit(e.problemId, score));
             else if (score > heap.peek().score) {
                 heap.poll();
                 heap.add(new Hit(e.problemId, score));
