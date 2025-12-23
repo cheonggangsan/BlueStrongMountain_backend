@@ -15,7 +15,7 @@ public class InMemoryBojEmbeddingIndex {
     public record Entry(int problemId, float[] vec) {}
     public record Hit(int problemId, double score) {}
 
-    private final ObjectMapper om = new ObjectMapper();
+    private static final ObjectMapper om = new ObjectMapper();
     private final File jsonFile;
 
     private List<Entry> entries = List.of();
