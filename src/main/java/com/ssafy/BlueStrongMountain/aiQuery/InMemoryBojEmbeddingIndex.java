@@ -67,9 +67,18 @@ public class InMemoryBojEmbeddingIndex {
     }
 
     public List<Hit> searchTopK(List<Float> queryEmbedding, int topK) {
+        if (queryEmbedding == null || queryEmbedding.isEmpty()) {
+            throw new IllegalArgumentException("Query embedding cannot be null or empty");
+        }
+        if (topK <= 0) {
+            throw new IllegalArgumentException("topK must be positive, got: " + topK);
+        }
+
+        int effectiveK = Math.min(topK, entries.size());
+
         float[] q = toUnitFloatArray(queryEmbedding);
 
-        PriorityQueue<Hit> heap = new PriorityQueue<>(Comparator.comparingDouble(Hit::score));
+        PriorityQueue<Hit> heap = new PriorityQueue<>(effectiveK, Comparator.comparingDouble(Hit::score));
 
         for (Entry e : entries) {
             double score = dot(q, e.vec);
