@@ -22,7 +22,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             "/api/v1/auth/existHandle",
             "/api/v1/auth/duplicate/username",
             "/api/v1/auth/register",
-            "/api/v1/auth/login"
+            "/api/v1/auth/login",
+            "/api/v1/problem/ai"
     );
 
     @Override
@@ -59,7 +60,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
     private String resolveToken(HttpServletRequest req){
         String bearer = req.getHeader("Authorization");
-        if(bearer == null || !bearer.startsWith("Bearer")){
+        if(bearer == null || !bearer.startsWith("Bearer ")){
             return null;
         }
         return bearer.substring(7);
