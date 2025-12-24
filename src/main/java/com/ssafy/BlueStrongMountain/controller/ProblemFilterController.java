@@ -29,7 +29,7 @@ public class ProblemFilterController {
 
     @GetMapping("/filter")
     public ResponseEntity<FilteredProblemsResponse> filter(
-            @PathVariable Long groupId,
+            @PathVariable("groupId") Long groupId,
             @RequestParam(required = false) String mode,
             @RequestParam(required = false) List<Long> problemIds,
             @RequestParam(required = false) Integer difficultyFrom,
