@@ -10,9 +10,20 @@ import java.util.Optional;
 public interface ProblemMapper {
     List<ProblemDto> findAll();
     List<ProblemDto> findByIdList(@Param("ids") List<Long> ids);
-//    Optional<Problem> findById(Long id);
-//    List<Problem> findByTag(Long tagId);
-//    void save(Problem problem);
-//    void update(Problem problem);
+    List<ProblemDto> findProblems(
+            @Param("difficultyFrom") Integer difficultyFrom,
+            @Param("difficultyTo") Integer difficultyTo,
+            @Param("tags") List<String> tags,
+            @Param("minSolvers") Integer minSolvers
+    );
+
+    List<ProblemDto> findUnsolvedProblemsByGroup(
+            @Param("groupId") Long groupId,
+            @Param("difficultyFrom") Integer difficultyFrom,
+            @Param("difficultyTo") Integer difficultyTo,
+            @Param("tags") List<String> tags,
+            @Param("minSolvers") Integer minSolvers
+    );
+
 
 }
